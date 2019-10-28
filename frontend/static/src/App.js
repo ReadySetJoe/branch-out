@@ -45,12 +45,18 @@ class App extends React.Component {
   getNowPlaying() {
     spotifyApi.getMyCurrentPlaybackState()
       .then((response) => {
+        console.log(response)
+        console.log(this.state)
         this.setState({
           nowPlaying: {
             name: response.item.name,
             image: response.item.album.images[0].url
           }
         })
+    })
+    .catch(error => {
+      console.log(error)
+      console.log(this.state)      
     })
   }
 
@@ -138,16 +144,12 @@ class App extends React.Component {
         <br/>
         <br/>
 
-          <a href='http://localhost:8888'>
-              <button>log in to Spotify</button>
-          </a>
-
           <button onClick={() => this.getNowPlaying()}>get now playing</button>
           <div>{this.state.nowPlaying.name}:</div>
           <div>
             <img src={this.state.nowPlaying.image} style={{width: 100}}></img>
           </div>
-
+{/* 
           <button onClick={() => this.getTopArtists()}>get top artists</button>
           <div>{this.state.topArtists}</div>
 
@@ -156,7 +158,7 @@ class App extends React.Component {
 
           <button onClick={() => this.getMyLocation()}>get user location</button>
 
-          <div></div>
+          <div></div> */}
 
 
 

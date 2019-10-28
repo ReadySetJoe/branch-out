@@ -1,10 +1,10 @@
 from django.urls import path, include, re_path
 
-from .views import *
+from . import views
 
 
 urlpatterns = [
     # re_path(r'^(?:.*)/?$', IndexView.as_view(), name='frontend_routes'),
-    # path('', IndexView.as_view(), name='index'),
-    path('', index, name='index'),
+    path('', views.IndexView.as_view(), name='landing'),
+    # path('register-by-token/(?P<backend>[^/]+)/$', views.register_by_access_token, name='register-by-token'),
 ]

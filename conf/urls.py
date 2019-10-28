@@ -15,11 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.conf import settings
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('social/', include('social_django.urls')),
     path('api/v1/', include('api.urls')),
     path('auth-api/', include('rest_framework.urls')),
     path('', include('django.contrib.auth.urls')),
@@ -27,9 +28,8 @@ urlpatterns = [
     # path('api/v1/rest-auth/', include('rest_auth.urls')),
     # react url patterns
     path('boards/new/', include('frontend.urls')),
-    path('social/', include('social_django.urls')),
     path('', include('frontend.urls')),
 ]
 
-if settings.DEBUG: # new
+if settings.DEBUG:  # new
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

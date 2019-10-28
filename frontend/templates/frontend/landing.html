@@ -1,0 +1,8 @@
+<h2>This is the landing screen!</h2>
+
+{% if user.is_authenticated %}
+<p>this shouldn't display (the user is authenticated)</p>
+{% else %}
+<p>the user is not authenticated</p>
+<a href="{% url 'social:begin' 'spotify' %}">Login to Spotify</a>
+{% endif %}
