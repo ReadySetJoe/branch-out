@@ -4,5 +4,9 @@
 <p>this shouldn't display (the user is authenticated)</p>
 {% else %}
 <p>the user is not authenticated</p>
-<a href="{% url 'social:begin' 'spotify' %}">Login to Spotify</a>
+<a href="{% url 'social:begin' 'spotify' %}">Login to Spotify option 1 (new way)</a>
+<a href="http://localhost:8888/">Login to Spotify option 2 (old way)</a>
+<script src="./landing.js"></script>
+<button href="http://localhost:8888/">Login to Spotify option 2 (old way)</button>
+
 {% endif %}

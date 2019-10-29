@@ -21,13 +21,13 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('social/', include('social_django.urls')),
+    path('register-by-token/', include('frontend.urls')),
     path('api/v1/', include('api.urls')),
     path('auth-api/', include('rest_framework.urls')),
     path('', include('django.contrib.auth.urls')),
-    # path('api/v1/rest-auth/registration/', include('rest_auth.registration.urls')),
-    # path('api/v1/rest-auth/', include('rest_auth.urls')),
+    path('api/v1/rest-auth/', include('rest_auth.urls')),
+
     # react url patterns
-    path('boards/new/', include('frontend.urls')),
     path('', include('frontend.urls')),
 ]
 
