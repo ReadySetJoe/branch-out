@@ -59,31 +59,6 @@ class App extends React.Component {
       progress_ms: 0,
       top_artists: [],
     };
-  
-    // const params = this.getHashParams();
-    // const token = params.access_token;
-    // if (token) {
-    //   spotifyApi.setAccessToken(token);
-    // }
-    // this.state = {
-    //   loggedIn: token ? true : false,
-    //   nowPlaying: {
-    //     name: 'not checked',
-    //     image: ''
-    //   },
-    //   topArtists: [],
-    //   topArtistEvents: [],
-      // coords: {
-      //   latitude,
-      //   longitude,
-      //   altitude,
-      //   accuracy,
-      //   altitudeAccuracy,
-      //   heading,
-      //   speed,
-      // }
-    // }
-
     this.getCurrentlyPlaying = this.getCurrentlyPlaying.bind(this);
   }
 
@@ -99,16 +74,13 @@ class App extends React.Component {
         console.log(data)
       })
       .catch(error => {
-        console.log(error)
-        console.log(this.state)      
+        console.log(error)    
       })
   }
 
   componentDidMount() {
-    // Set token
     let _token = hash.access_token;
     if (_token) {
-      // Set token
       this.setState({
         token: _token
       });
@@ -118,48 +90,12 @@ class App extends React.Component {
 
   getTopArtists() {
     spotifyApi.getMyTopArtists()
-    // .then((response) => console.log(response))
     .then((response) => {
       this.setState({
         top_artists: response.items.map(artist => artist.name)
       })
     })
   }
-
-  // getMyLocation() {
-  //     if (navigator.geolocation) {
-  //         navigator.geolocation.getCurrentPosition(showPosition, showError);
-  //     } else {
-  //         var x = document.getElementById("location");
-  //         x.innerHTML = "Geolocation is not supported by this browser.";
-  //     }
-  // }
-
-//   showPosition(position) {
-//     var x = document.getElementById("location");
-//     x.innerHTML = "Latitude: " + position.coords.latitude + 
-//     "<br>Longitude: " + position.coords.longitude; 
-//     var latlon = position.coords.latitude + "," + position.coords.longitude;
-
-
-//     $.ajax({
-//       type:"GET",
-//       url:"https://app.ticketmaster.com/discovery/v2/events.json?apikey=pLOeuGq2JL05uEGrZG7DuGWu6sh2OnMz&latlong="+latlon,
-//       async:true,
-//       dataType: "json",
-//       success: function(json) {
-//                   console.log(json);
-//                   var e = document.getElementById("events");
-//                   e.innerHTML = json.page.totalElements + " events found.";
-//                   showEvents(json);
-//                   initMap(position, json);
-//                },
-//       error: function(xhr, status, err) {
-//                   console.log(err);
-//                }
-//     });
-
-// }
 
   // getTopArtistEvents() {
   //   fetch("https://rest.bandsintown.com/artists/"
@@ -185,31 +121,6 @@ class App extends React.Component {
   //       }
   //     )
   // }
-
-//   render() {
-
-//     return (
-//       <>
-
-//       {/* <button onClick={() => this.spotifyLogin()}>Log in to Spotify</button>
-//       <button onClick={() => this.getNowPlaying()}>get now playing</button>
-//       <div>{this.state.nowPlaying.name}:</div>
-//       <div>
-//         <img src={this.state.nowPlaying.image} style={{width: 100}}></img>
-//       </div> */}
-// {/* 
-//       <button onClick={() => this.getTopArtists()}>get top artists</button>
-//       <div>{this.state.topArtists}</div>
-
-//       <button onClick={() => this.getTopArtistEvents()}> get top artist events </button>
-//       <div>{this.state.topArtistEvents}</div>
-
-//       <button onClick={() => this.getMyLocation()}>get user location</button>
-
-//       <div></div> */}
-//       </>
-//   )};
-// }
 
 render() {
   return (
