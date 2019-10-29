@@ -47,17 +47,17 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'rest_auth',
+    'rest_auth.registration',
     'allauth',  # new
-    'allauth.account',  # new
-    'allauth.socialaccount',  # new
-    'rest_auth.registration',  # new
-    'social_django',
+    # 'allauth.account',  # new
+    # 'allauth.socialaccount',  # new
 
     # local
-    'api.apps.ApiConfig',
-    'boards.apps.BoardsConfig',
-    'frontend.apps.FrontendConfig',
-    'limbs.apps.LimbsConfig',
+    'api',
+    'frontend',
+    'limbs',
+    'events',
+    'songs',
 ]
 
 REST_FRAMEWORK = {

@@ -23,12 +23,14 @@
   margin-left: 5%;
   width: 45%;
 }
+
 /** Progress **/
 .progress {
   border: 1px solid #eee;
   height: 6px;
   border-radius: 3px;
   overflow: hidden;
+  background: none;
 }
 .progress__bar {
   background-color: #eee;

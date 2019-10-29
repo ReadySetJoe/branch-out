@@ -1,10 +1,13 @@
 import React from 'react';
 import axios from 'axios';
 // import * as os from 'os';
-import './App.css';
-import Player from "./Player";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSync } from '@fortawesome/free-solid-svg-icons'
 //import {geolocated} from "react-geolocated";
 import SpotifyWebApi from 'spotify-web-api-js';
+import Player from "./Player";
+import './App.css';
+
 const spotifyApi = new SpotifyWebApi();
 
 export const authEndpoint = 'https://accounts.spotify.com/authorize';
@@ -40,8 +43,8 @@ if (token) {
 window.location.hash = "";
 
 class App extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       token: null,
       item: {
@@ -111,24 +114,6 @@ class App extends React.Component {
       });
     }
     this.getCurrentlyPlaying()
-  }
-
-  getNowPlaying() {
-    spotifyApi.getMyCurrentPlaybackState()
-      .then((response) => {
-        console.log(response)
-        console.log(this.state)
-        this.setState({
-          nowPlaying: {
-            name: response.item.name,
-            image: response.item.album.images[0].url
-          }
-        })
-    })
-    .catch(error => {
-      console.log(error)
-      console.log(this.state)      
-    })
   }
 
   getTopArtists() {
@@ -240,13 +225,18 @@ render() {
           Login to Spotify
         </a>
       )}
-      {this.state.token && (
-        <Player
-          item={this.state.item}
-          is_playing={this.state.is_playing}
-          progress_ms={this.progress_ms}
-        />
-      )}
+      <div className='player-wrapper'>
+        {this.state.token && (
+          <Player
+            item={this.state.item}
+            is_playing={this.state.is_playing}
+            progress_ms={this.state.progress_ms}
+          />
+        )}
+        {this.state.token && (
+          <button className='btn p-1 refresh-btn' onClick={() => this.getCurrentlyPlaying()}><span className="p-1"><FontAwesomeIcon icon={faSync} /></span></button>
+        )}
+      </div>
       <br/>
       <br/>
       <br/>

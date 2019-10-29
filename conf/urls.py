@@ -15,17 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.conf import settings
-from django.urls import path, include, re_path
+from django.urls import path, include
 from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('social/', include('social_django.urls')),
-    path('register-by-token/', include('frontend.urls')),
     path('api/v1/', include('api.urls')),
+    path('api/v1/rest-auth/', include('rest_auth.urls')),
     path('auth-api/', include('rest_framework.urls')),
     path('', include('django.contrib.auth.urls')),
-    path('api/v1/rest-auth/', include('rest_auth.urls')),
 
     # react url patterns
     path('', include('frontend.urls')),

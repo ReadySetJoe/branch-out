@@ -100,6 +100,11 @@ body {
   z-index: 1;
 }
 
+.player-wrapper {
+  display: flex;
+  align-items: center;
+}
+
 .container {
   align-items: center;
   display: flex;
@@ -109,4 +114,13 @@ body {
 
 .main-container {
   flex: 1;
+}
+
+.refresh-btn {
+  font-size: 33px;
+  color: #fff;
+  background: none;
+  border: none;
+  width: 60px;
+  height: 60px;
 }

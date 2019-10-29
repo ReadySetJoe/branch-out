@@ -4,34 +4,34 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 
 from .permissions import IsOwnerOrReadOnly
-from .serializers import BoardSerializer
-from boards.models import Board
-
-
-class BoardListCreateAPIView(generics.ListCreateAPIView):
-    # permission_classes = (permissions.IsAuthenticated,)
-    queryset = Board.objects.all()
-    serializer_class = BoardSerializer
-
-    def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user)
-
-
-class BoardRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = (IsOwnerOrReadOnly,)
-    queryset = Board.objects.all()
-    serializer_class = BoardSerializer
-
-    def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user)
-
-
-# class BoardViewSet(viewsets.ModelViewSet):
+# from .serializers import BoardSerializer
+# from boards.models import Board
+#
+#
+# class BoardListCreateAPIView(generics.ListCreateAPIView):
+#     # permission_classes = (permissions.IsAuthenticated,)
+#     queryset = Board.objects.all()
+#     serializer_class = BoardSerializer
+#
+#     def perform_create(self, serializer):
+#         serializer.save(created_by=self.request.user)
+#
+#
+# class BoardRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
 #     permission_classes = (IsOwnerOrReadOnly,)
 #     queryset = Board.objects.all()
 #     serializer_class = BoardSerializer
-
-
+#
+#     def perform_create(self, serializer):
+#         serializer.save(created_by=self.request.user)
+#
+#
+# # class BoardViewSet(viewsets.ModelViewSet):
+# #     permission_classes = (IsOwnerOrReadOnly,)
+# #     queryset = Board.objects.all()
+# #     serializer_class = BoardSerializer
+#
+#
 class CustomAuthToken(ObtainAuthToken):
 
     def post(self, request, *args, **kwargs):
