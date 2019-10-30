@@ -8,7 +8,7 @@ class SongSerializer(serializers.ModelSerializer):
     class Meta:
         model = Song
         depth = 1
-        fields = '__all__'
+        fields = ['title', 'artist', 'track_number', 'url', 'duration_ms']
 
 
 class UserSocialAuthSerializer(serializers.ModelSerializer):

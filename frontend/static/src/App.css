@@ -65,9 +65,27 @@ body {
   padding: 0.7em 1.5em;
   text-transform: uppercase;
   transition: all 0.25s ease;
+  margin: 5px;
+}
+
+.btn-disabled {
+  background-color: transparent;
+  border-radius: 2em;
+  border: 0.2em solid rgb(139, 139, 139);
+  color: rgb(139, 139, 139);
+  font-size: 3vmin;
+  padding: 0.7em 1.5em;
+  text-transform: uppercase;
+  transition: all 0.25s ease;
+  margin: 5px;
 }
 
 .btn:hover {
+  background: #1ecd97;
+  color: #333;
+}
+
+.btn-selected {
   background: #1ecd97;
   color: #333;
 }

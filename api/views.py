@@ -16,9 +16,6 @@ class SongListCreateAPIView(generics.ListCreateAPIView):
     queryset = Song.objects.all()
     serializer_class = SongSerializer
 
-    def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user)
-
 
 class UserSocialAuthRetrieveAPIView(generics.RetrieveAPIView):
     permission_classes = (permissions.IsAuthenticated,)
@@ -40,6 +37,8 @@ class UserSocialAuthViewSet(viewsets.ViewSet):
         user = get_object_or_404(queryset, pk=pk)
         serializer = UserSocialAuthSerializer(user)
         return Response(serializer.data)
+
+
 # class BoardRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
 #     permission_classes = (IsOwnerOrReadOnly,)
 #     queryset = Board.objects.all()
