@@ -82,13 +82,24 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-
-    let _token = hash.access_token;
-    if (_token) {
+    let _token
+    axios.get('/api/v1/user-social-auth/')
+    .then(res => {
+      console.log(res)
+      console.log(res.data)
+      console.log(res.data[0])
+      console.log(res.data[0].extra_data)
+      console.log(res.data[0].extra_data.access_token)
+      _token = res.data[0].extra_data.access_token
       this.setState({
         token: _token
       });
-    }
+      spotifyApi.setAccessToken(_token)
+    })
+    .catch(err => {
+      console.log(err)
+    })
+
     this.getCurrentlyPlaying()
     this.getTopArtists()
   }
