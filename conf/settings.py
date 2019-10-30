@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'allauth',  # new
     # 'allauth.account',  # new
     # 'allauth.socialaccount',  # new
+    'social_django',
 
     # local
     'api',
@@ -216,7 +217,7 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.user.create_user',
     'social_core.pipeline.social_auth.associate_user',
     'social_core.pipeline.social_auth.load_extra_data',
-    'api.views.register_by_access_token',  # <--- set the path to the function
+    # 'api.views.register_by_access_token',  # <--- set the path to the function
     'social_core.pipeline.user.user_details',
 )
 

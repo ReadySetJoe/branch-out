@@ -24,6 +24,7 @@ urlpatterns = [
     path('api/v1/rest-auth/', include('rest_auth.urls')),
     path('api/v1/rest-auth/registration/', include('rest_auth.registration.urls')),
     path('auth-api/', include('rest_framework.urls')),
+    path('social/', include('social_django.urls')),
     path('', include('django.contrib.auth.urls')),
 
     # react url patterns

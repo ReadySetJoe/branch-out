@@ -82,6 +82,7 @@ class App extends React.Component {
   }
 
   componentDidMount() {
+
     let _token = hash.access_token;
     if (_token) {
       this.setState({
@@ -91,6 +92,17 @@ class App extends React.Component {
     this.getCurrentlyPlaying()
     this.getTopArtists()
   }
+
+//   spotifyLogin() {
+//     axios.get('social/login/spotify/',
+//     href={`${authEndpoint}
+//     ?client_id=${clientId}
+//     &redirect_uri=${redirectUri}&scope=
+//     ${scopes.join("%20")}
+//     &response_type=token
+//     &show_dialog=true`}
+// )
+//   }
 
   getCurrentlyPlaying() {
     spotifyApi.getMyCurrentPlaybackState()
@@ -175,12 +187,20 @@ render() {
       <nav><ul>
         </ul></nav>
       {!this.state.token && (
-        <a
+        <div>
+          <a
+          className="btn btn--loginApp-link"
+          href="/social/login/spotify/"
+          >
+          Login to Spotify (Authorization Code)
+          </a>
+          <a
           className="btn btn--loginApp-link"
           href={`${authEndpoint}?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes.join("%20")}&response_type=token&show_dialog=true`}
-        >
-          Login to Spotify
-        </a>
+          >
+          Login to Spotify (Implicit Grant)
+          </a>
+        </div>
       )}
       <div className='player-wrapper'>
         {this.state.token && (
