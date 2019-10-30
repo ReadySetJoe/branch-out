@@ -68,6 +68,16 @@ body {
   margin: 5px;
 }
 
+.btn:hover {
+  background: #1ecd97;
+  color: #333;
+}
+
+.btn-selected {
+  background: #1ecd97;
+  color: #333;
+}
+
 .btn-disabled {
   background-color: transparent;
   border-radius: 2em;
@@ -80,16 +90,9 @@ body {
   margin: 5px;
 }
 
-.btn:hover {
-  background: #1ecd97;
-  color: #333;
+.btn-disabled:hover {
+  cursor: default;
 }
-
-.btn-selected {
-  background: #1ecd97;
-  color: #333;
-}
-
 .btn--login {
   margin: 0 auto;
 }

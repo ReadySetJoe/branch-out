@@ -65,9 +65,11 @@ class App extends React.Component {
       // Artist Selection
       root_artists: [],
       root_artists_selected: [],
-      use_currently_playing: false,
+      use_now_playing: false,
       use_top_artists: false,
       root_artists_selection_complete: false,
+
+      // Location
 
       // Limb
       // Songs
@@ -82,6 +84,7 @@ class App extends React.Component {
     this.useNowPlaying = this.useNowPlaying.bind(this);
     this.addNowPlayingToList = this.addNowPlayingToList.bind(this);
     this.selectArtist = this.selectArtist.bind(this);
+    this.useMyLocation = this.useMyLocation.bind(this)
   }
 
   componentDidMount() {    
@@ -111,6 +114,7 @@ class App extends React.Component {
         item: data.item,
         is_playing: data.is_playing,
         progress_ms: data.progress_ms,
+        use_now_playing: false,
       });
       console.log(data)
     })
@@ -124,7 +128,7 @@ class App extends React.Component {
     .then(data => {
       this.setState({
         root_artists: data.artists,
-        use_currently_playing: true, 
+        use_now_playing: true, 
         use_top_artists: false
       })
       console.log(data)
@@ -138,7 +142,7 @@ class App extends React.Component {
       this.setState({
         root_artists: data.items,
         use_top_artists: true, 
-        use_currently_playing: false
+        use_now_playing: false
       })
     })
     .catch(err => {
@@ -183,6 +187,21 @@ class App extends React.Component {
     }
   }
 
+  useMyLocation() {
+    // check if geolocation is supported/enabled on current browser
+    navigator.geolocation.getCurrentPosition(
+    function success(position) {
+      // for when getting location is a success
+      console.log('latitude', position.coords.latitude, 
+                  'longitude', position.coords.longitude);
+    },
+    function error(error_message) {
+      // for when getting location results in an error
+      console.error('An error has occured while retrieving location', error_message)
+      }  
+    );
+  }
+
   // getTopArtistEvents() {
   //   fetch("https://rest.bandsintown.com/artists/"
   //     + this.state.topArtists[1].split(' ').join('%20') 
@@ -209,8 +228,8 @@ class App extends React.Component {
   // }
 
 render() {
-  let root_artists = this.state.root_artists.map(artist => 
-    <button 
+  let root_artists = this.state.root_artists.map((artist, id) => 
+    <button key={id}
     className={`btn root-artist-btn ${this.state.root_artists_selected.includes(artist) ? ('btn-selected') : ('')}`}
     onClick={() => this.selectArtist(artist)}
     >
@@ -253,7 +272,7 @@ render() {
           <br/>
           <br/>
           <br/>
-          <button className={`btn ${this.state.use_currently_playing ? 'btn-selected' : ''} `} onClick={() => this.useNowPlaying()}>Use Artists Related to Now Playing</button>
+          <button className={`btn ${this.state.use_now_playing ? 'btn-selected' : ''} `} onClick={() => this.useNowPlaying()}>Use Artists Related to Now Playing</button>
           <button className={`btn ${this.state.use_top_artists ? 'btn-selected' : ''} `} onClick={() => this.useTopArtists()}>Use Your Top Artists</button>
         </div>
       )}
@@ -269,7 +288,7 @@ render() {
       <br/>
       <br/>
 
-      <div className={`${this.state.use_currently_playing || this.state.use_top_artists ? 'd-flex' : 'd-none'} `}>
+      <div className={`${this.state.use_now_playing || this.state.use_top_artists ? 'd-flex' : 'd-none'} `}>
         <h2>Select at least 3 starting bands to continue</h2>
         <button 
         onClick={() => {
@@ -280,6 +299,16 @@ render() {
         className={`${this.state.root_artists_selected.length >= 3 ? 'btn' : 'btn-disabled'} ${this.state.root_artists_selection_complete ? 'btn-selected' : ''}`}
         >Continue Using These Bands</button> 
       </div>
+
+      <div className={`location ${this.state.root_artists_selection_complete ? 'd-flex' : 'd-none'}`}>
+        <div className={` ${"geolocation" in navigator ? 'd-flex btn' : 'd-none'}`}>
+          <button onClick={() => this.useMyLocation()}>Find My Location</button>
+          ~or~          
+        </div>
+        
+
+      </div>
+
 
 
       
