@@ -4,19 +4,19 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 
 from .permissions import IsOwnerOrReadOnly
-# from .serializers import BoardSerializer
-# from boards.models import Board
-#
-#
-# class BoardListCreateAPIView(generics.ListCreateAPIView):
-#     # permission_classes = (permissions.IsAuthenticated,)
-#     queryset = Board.objects.all()
-#     serializer_class = BoardSerializer
-#
-#     def perform_create(self, serializer):
-#         serializer.save(created_by=self.request.user)
-#
-#
+from .serializers import SongSerializer
+from songs.models import Song
+
+
+class SongListCreateAPIView(generics.ListCreateAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = Song.objects.all()
+    serializer_class = SongSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
+
 # class BoardRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
 #     permission_classes = (IsOwnerOrReadOnly,)
 #     queryset = Board.objects.all()
@@ -32,6 +32,7 @@ from .permissions import IsOwnerOrReadOnly
 # #     serializer_class = BoardSerializer
 #
 #
+
 class CustomAuthToken(ObtainAuthToken):
 
     def post(self, request, *args, **kwargs):
@@ -45,3 +46,4 @@ class CustomAuthToken(ObtainAuthToken):
             'user_id': user.pk,
             'username': user.username
         })
+

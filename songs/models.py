@@ -6,6 +6,7 @@ class Song(models.Model):
     artist = models.CharField(max_length=255)
     track_number = models.SmallIntegerField(default=1)
     url = models.URLField()
+    duration_ms = models.IntegerField(default=0)
 
     def __str__(self):
         return self.title + ' by ' + self.artist

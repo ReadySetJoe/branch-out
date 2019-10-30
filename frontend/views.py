@@ -14,24 +14,19 @@ class IndexView(View):
     """
 
     def get(self, request, *args, **kwargs):
-        # if request.user.is_authenticated:
-            try:
-                with open(os.path.join(settings.REACT_APP_DIR, 'build', 'index.html')) as f:
-                    return HttpResponse(f.read())
-            except FileNotFoundError:
-                logging.exception('Production build of app not found')
-                return HttpResponse(
-                    """
-                   This URL is only used when you have built the production
-                   version of the app. Visit http://localhost:3000/ instead, or
-                   run `npm run build` to test the production version.
-                   """,
-                    status=501,
-                )
-        # else:
-        #     template = loader.get_template('frontend/landing.html')
-        #     context = {}
-        #     return HttpResponse(template.render(context, request))
+        try:
+            with open(os.path.join(settings.REACT_APP_DIR, 'build', 'index.html')) as f:
+                return HttpResponse(f.read())
+        except FileNotFoundError:
+            logging.exception('Production build of app not found')
+            return HttpResponse(
+                """
+               This URL is only used when you have built the production
+               version of the app. Visit http://localhost:3000/ instead, or
+               run `npm run build` to test the production version.
+               """,
+                status=501,
+            )
 
 from django.contrib.auth import login
 

@@ -8,13 +8,16 @@ import SpotifyWebApi from 'spotify-web-api-js';
 import Player from "./Player";
 import './App.css';
 
+axios.defaults.xsrfCookieName = 'csrftoken';
+axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+
 const spotifyApi = new SpotifyWebApi();
 
 export const authEndpoint = 'https://accounts.spotify.com/authorize';
 // Replace with your app's client ID, redirect URI and desired scopes
 // const clientId = os.environ['spotify_client_id'];
 const clientId = '45eecc039efd45ad9b8e183c653e2885';
-const redirectUri = "http://localhost:8000/";
+const redirectUri = "http://localhost:3000/";
 const scopes = [
   "user-read-currently-playing",
   "user-read-playback-state",
@@ -34,11 +37,11 @@ const hash = window.location.hash
     }
     return initial;
   }, {});
-console.log(hash)
 const token = hash.access_token;
 if (token) {
   spotifyApi.setAccessToken(token);
-  console.log('access token set!')
+  console.log(token)
+  // axios.post('/api/v1/rest-auth/login/')
 }
 window.location.hash = "";
 
@@ -47,6 +50,8 @@ class App extends React.Component {
     super(props);
     this.state = {
       token: null,
+      
+      // Now Playing
       item: {
         album: {
           images: [{ url: "" }]
@@ -57,25 +62,23 @@ class App extends React.Component {
       },
       is_playing: "Paused",
       progress_ms: 0,
+
+      // Artist Selection
       top_artists: [],
+      selected_top_artists: [],
+      use_currently_playing: true,
+
+      // Limb
+      // Songs
+      songs: [],
+
+      // Events
+      events: [],
+
     };
     this.getCurrentlyPlaying = this.getCurrentlyPlaying.bind(this);
-  }
-
-
-  getCurrentlyPlaying() {
-    spotifyApi.getMyCurrentPlaybackState()
-      .then((data) => {
-        this.setState({
-          item: data.item,
-          is_playing: data.is_playing,
-          progress_ms: data.progress_ms,
-        });
-        console.log(data)
-      })
-      .catch(error => {
-        console.log(error)    
-      })
+    this.getTopArtists = this.getTopArtists.bind(this);
+    this.addNowPlayingToList = this.addNowPlayingToList.bind(this);
   }
 
   componentDidMount() {
@@ -86,14 +89,57 @@ class App extends React.Component {
       });
     }
     this.getCurrentlyPlaying()
+    this.getTopArtists()
+  }
+
+  getCurrentlyPlaying() {
+    spotifyApi.getMyCurrentPlaybackState()
+    .then(data => {
+      this.setState({
+        item: data.item,
+        is_playing: data.is_playing,
+        progress_ms: data.progress_ms,
+      });
+      console.log(data)
+      axios.post()
+    })
+    .catch(error => {
+      console.log(error)    
+    })
   }
 
   getTopArtists() {
     spotifyApi.getMyTopArtists()
-    .then((response) => {
+    .then(data => {
       this.setState({
-        top_artists: response.items.map(artist => artist.name)
+        top_artists: data.items.map(artist => artist.name)
       })
+    })
+    .catch(err => {
+      console.log(err)
+    })
+  }
+
+  addNowPlayingToList() {
+    let formData = new FormData();
+    formData.append('title', this.state.item.name);
+    formData.append('artist', this.state.item.album.images[0].url);
+    formData.append('url', this.state.item.href);
+    formData.append('track_number', this.state.songs.length);
+    formData.append('duration_ms', this.state.item.duration_ms);
+    localStorage.setItem('formData',formData)
+    console.log(formData)
+
+    axios.post('/api/v1/songs/', formData, {
+      headers: {
+        'content-type': 'multipart/form-data'
+      }
+    })
+    .then(() => {
+      console.log('Current song added to song list!')
+    })
+    .catch(error => {
+      console.log(error)
     })
   }
 
@@ -151,7 +197,9 @@ render() {
       <br/>
       <br/>
       <br/>
-      <button onClick={() => this.getTopArtists()}>get top artists</button>
+      <button onClick={() => this.addNowPlayingToList()}>Use This Artist</button>
+
+      <button onClick={() => this.getTopArtists()}>Use Top Artists</button>
       <div>{this.state.top_artists}</div>
 
       </header>
