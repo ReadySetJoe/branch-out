@@ -16,17 +16,7 @@ axios.defaults.xsrfHeaderName = 'X-CSRFToken';
 
 const spotifyApi = new SpotifyWebApi();
 
-// export const authEndpoint = 'https://accounts.spotify.com/authorize';
-// const redirectUri = "http://localhost:8000/";
-// const scopes = ["user-read-currently-playing", "user-read-playback-state", "user-read-private", "user-read-email", "user-top-read", 'playlist-modify-public',];
-
 let SK_AUTH_KEY = 'io09K9l3ebJxmxe2'
-
-// API Keys:
-const USE_HARD_CODED_VALUES = true
-if (!USE_HARD_CODED_VALUES) {
-  SK_AUTH_KEY = os.environ['SOMEGUYS_SK_AUTH_KEY']
-}
 
 // API Limiter (debug boolean ensuring limited API calling) 
 const API_LIMITER = false;
@@ -63,7 +53,6 @@ class App extends React.Component {
       use_zipcode: false,
       use_latlong: false,
 
-      // Limb
       // Artists
       artists_all: [],
       artists: [],
@@ -75,6 +64,9 @@ class App extends React.Component {
       matches: [],
       // Songs
       songs: [],
+
+      // Limbs
+      limbs: [],
 
     };
     this.getNowPlaying = this.getNowPlaying.bind(this);
@@ -109,12 +101,14 @@ class App extends React.Component {
   getNowPlaying() {
     spotifyApi.getMyCurrentPlaybackState()
       .then(data => {
-        this.setState({
-          item: data.item,
-          is_playing: data.is_playing,
-          progress_ms: data.progress_ms,
-          use_now_playing: false,
-        });
+        if (data) {
+          this.setState({
+            item: data.item,
+            is_playing: data.is_playing,
+            progress_ms: data.progress_ms,
+            use_now_playing: false,
+          });
+        }
         console.log(data)
       })
       .catch(error => {
@@ -292,7 +286,7 @@ class App extends React.Component {
                   }
                 }
               }
-              this.setState({events_artists:events_artists})
+              this.setState({ events_artists: events_artists })
             })
               .catch(err => {
                 console.log(err)
@@ -308,7 +302,7 @@ class App extends React.Component {
             events_artists.push(e.performance[j].artist)
           }
         }
-        this.setState({events_artists:events_artists})
+        this.setState({ events_artists: events_artists })
         // console.log({events_artists})
       })
       .catch(err => {
@@ -320,17 +314,16 @@ class App extends React.Component {
     let i;
     for (i = 0; i < this.state.root_artists_selected.length; i++) {
       spotifyApi.getArtistRelatedArtists(this.state.root_artists_selected[i].id)
-      // eslint-disable-next-line no-loop-func
-      .then(res => {
-        let artists_all = [...this.state.artists_all]
-        artists_all = artists_all.concat(res.artists)
-        this.setState({artists_all:artists_all})        
-    
-        console.log(res)
-      })
-      .catch(err => {
-        console.log(err)
-      })
+        // eslint-disable-next-line no-loop-func
+        .then(res => {
+          let artists_all = [...this.state.artists_all]
+          artists_all = artists_all.concat(res.artists)
+          this.setState({ artists_all: artists_all })
+          console.log(res)
+        })
+        .catch(err => {
+          console.log(err)
+        })
     }
   }
 
@@ -346,20 +339,20 @@ class App extends React.Component {
     console.log(`${artists_all_unique.length} are unique`)
 
     let i, j, a, b, matches = [];
-    for (i=0; i<artists_all_unique.length; i++) {
+    for (i = 0; i < artists_all_unique.length; i++) {
       a = artists_all_unique[i];
       // console.log(a)
-      for (j=0; j<events_artists_unique.length; j++) {
+      for (j = 0; j < events_artists_unique.length; j++) {
         b = events_artists_unique[j]
         // console.log(b)
-        if (a===b) {
+        if (a === b) {
           matches.push(a)
         }
       }
     }
     console.log(`and there are ${matches.length} matches`)
     console.log(matches)
-    this.setState({matches: matches})
+    this.setState({ matches: matches })
   }
 
   render() {
@@ -372,9 +365,9 @@ class App extends React.Component {
       </button>
     )
 
-    let events = this.state.events.map((event, id) =>
-      <div key={id} className="btn m-2">
-        {event.something}
+    let limbs = this.state.limbs.map((limb, id) =>
+      <div key={id} className="m-2">
+        {limb.something}
       </div>
     )
 
@@ -382,9 +375,12 @@ class App extends React.Component {
       <div className="App">
         <header className="App-header">
           <nav className="scrollspy-placeholder"><ul></ul></nav>
-          <div className="position-fixed fixed-top d-flex flex-row-reverse">
-            <a href="/logout/" className='logout-btn btn'>Logout</a>
-          </div>
+          {this.state.token && (
+            <div className="position-fixed fixed-top d-flex flex-row-reverse">
+              <a href="/logout/" className='logout-btn btn m-3'>Logout</a>
+            </div>
+          )}
+
           {!this.state.token && (
             <div>
               <a
@@ -405,11 +401,18 @@ class App extends React.Component {
             <div>
               <div className='player-wrapper'>
 
-                <Player
-                  item={this.state.item}
-                  is_playing={this.state.is_playing}
-                  progress_ms={this.state.progress_ms}
-                />
+                {this.state.item.album.images[0].url ? (
+                  <Player
+                    item={this.state.item}
+                    is_playing={this.state.is_playing}
+                    progress_ms={this.state.progress_ms}
+                  />
+                ) : (
+                    <div>
+                      <div>Let's get started.</div>
+                      <div>To make sure your Spotify is connected, play a song (on your phone, or any device) and hit the resync button to make sure you're connected</div>
+                    </div>
+                  )}
                 <button className='btn p-1 refresh-btn' onClick={() => this.getNowPlaying()}><span className="p-1"><FontAwesomeIcon icon={faSync} /></span></button>
 
               </div>
@@ -427,11 +430,11 @@ class App extends React.Component {
           <br />
 
           <div className={`${this.state.use_now_playing || this.state.use_top_artists ? 'd-flex align-items-center' : 'd-none'} `}>
-          <div>
-            <button className='btn' onClick={() => this.setState({root_artists_selected: this.state.root_artists})}>All</button>
-            <button className='btn' onClick={() => this.setState({root_artists_selected: []})}>None</button>
-          </div>
-            
+            <div>
+              <button className='btn' onClick={() => this.setState({ root_artists_selected: this.state.root_artists })}>All</button>
+              <button className='btn' onClick={() => this.setState({ root_artists_selected: [] })}>None</button>
+            </div>
+
             <div>{root_artists}</div>
 
           </div>
@@ -457,7 +460,7 @@ class App extends React.Component {
           <br />
 
           <div className={`location ${this.state.root_artists_selection_complete ? 'd-flex' : 'd-none'}`}>
-          {/* <div className={`location ${this.state.root_artists_selection_complete ? 'd-flex' : ''}`}> */}
+            {/* <div className={`location ${this.state.root_artists_selection_complete ? 'd-flex' : ''}`}> */}
             <div className="d-flex flex-column justify-content-left">
               <div className={` ${"geolocation" in navigator ? 'd-flex flex-column' : 'd-none'}`}>
                 <button className="btn" onClick={this.useMyLocation}>Find My Location</button>
@@ -474,7 +477,7 @@ class App extends React.Component {
           <br />
           <br />
 
-          <div className={` ${this.state.root_artists_selection_complete && this.state.latitude !== 0 ? 'd-flex flex-column': 'd-none'}`}>
+          <div className={` ${this.state.root_artists_selection_complete && this.state.latitude !== 0 ? 'd-flex flex-column' : 'd-none'}`}>
             Let's do the thing
             <br />
             <button className="btn" onClick={() => this.findEvents()}>Find Events</button>
@@ -489,7 +492,10 @@ class App extends React.Component {
 
           </div>
 
-
+          {this.state.matches.length > 0 && (
+            <div className="">
+              {limbs}
+            </div>)}
 
         </header>
       </div>
