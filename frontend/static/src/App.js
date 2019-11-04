@@ -83,8 +83,6 @@ class App extends React.Component {
       let _token
       axios.get(`/api/v1/user-social-auth/`)
         .then(res => {
-          // console.log(res)
-          // localStorage.setItem('res_token', JSON.stringify(res))
           _token = res.data[0].extra_data.access_token
           this.setState({
             token: _token
@@ -210,44 +208,15 @@ class App extends React.Component {
         self.setState({
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
-          // geohash: Geohash.encode(position.coords.latitude, position.coords.longitude, 9)
         })
       },
       function error(error_message) {
-        // for when getting location results in an error
         console.error('An error has occured while retrieving location', error_message)
       }
     )
   }
 
-  // Old Bandsintown code, possibly still useful
-  // getArtistEvents(artist_name) {
-  //   console.log('inside get artist events function')
-  //   axios({
-  //     method: 'get',
-  //     url: "https://rest.bandsintown.com/artists/"
-  //       + artist_name.split(' ').join('%20')
-  //       + `/events?app_id=${BIT_AUTH_KEY}`
-  //   })
-  //     .then(res => {
-  //       console.log(res)
-  //     })
-  //     .catch(err => {
-  //       console.log(err)
-  //     })
-  // }
-
   findEvents() {
-    // console.log('Starting to look for events')
-    // console.log(this.state.root_artists_selected)
-    // const artists = this.state.root_artists_selected
-    // console.log(artists)
-    // var i
-    // for (i=0; i<artists.length; i++) {
-    //   console.log('Looking for events for ' + artists[i].name)
-    //   this.getArtistEvents(artists[i].name)
-    // }
-
     axios({
       method: 'get',
       // url: `https://api.songkick.com/api/3.0/artists/308396/similar_artists.json?apikey=${SOMEGUYS_API_KEY}`,
@@ -341,10 +310,8 @@ class App extends React.Component {
     let i, j, a, b, matches = [];
     for (i = 0; i < artists_all_unique.length; i++) {
       a = artists_all_unique[i];
-      // console.log(a)
       for (j = 0; j < events_artists_unique.length; j++) {
         b = events_artists_unique[j]
-        // console.log(b)
         if (a === b) {
           matches.push(a)
         }
@@ -389,12 +356,6 @@ class App extends React.Component {
               >
                 Login to Spotify
             </a>
-              {/* <a
-                className="btn btn--loginApp-link"
-                href={`${authEndpoint}?client_id=${SPOTIFY_AUTH_KEY}&redirect_uri=${redirectUri}&scope=${scopes.join("%20")}&response_type=token&show_dialog=true`}
-              >
-                Login to Spotify (Implicit Grant)
-            </a> */}
             </div>
           )}
           {this.state.token && (
@@ -460,7 +421,6 @@ class App extends React.Component {
           <br />
 
           <div className={`location ${this.state.root_artists_selection_complete ? 'd-flex' : 'd-none'}`}>
-            {/* <div className={`location ${this.state.root_artists_selection_complete ? 'd-flex' : ''}`}> */}
             <div className="d-flex flex-column justify-content-left">
               <div className={` ${"geolocation" in navigator ? 'd-flex flex-column' : 'd-none'}`}>
                 <button className="btn" onClick={this.useMyLocation}>Find My Location</button>
