@@ -12,5 +12,5 @@ urlpatterns = [
     # path('boards/<int:pk>/', views.BoardRetrieveUpdateDestroyAPIView.as_view(), name='board_create'),
     path('songs/', views.SongListCreateAPIView.as_view(), name='song_create'),
     # path('user-social-auth/', views.UserSocialAuthRetrieveAPIView.as_view(), name='retrieve'),
-    path('user-social-auth/', views.UserSocialAuthViewSet.as_view({'get': 'list'})),
+    path('user-social-auth/', views.UserSocialAuthViewSet.as_view({'get': 'user'})),
 ]

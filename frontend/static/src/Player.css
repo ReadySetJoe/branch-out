@@ -18,6 +18,7 @@
 .now-playing__img img {
   max-width: 80vmin;
   width: 100%;
+  border: 1px solid #eee;
 }
 .now-playing__side {
   margin-left: 5%;

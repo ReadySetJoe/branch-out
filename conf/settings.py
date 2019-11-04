@@ -186,10 +186,10 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # new
 SITE_ID = 1  # new
 
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
-SOCIAL_AUTH_SPOTIFY_KEY = os.environ['SOCIAL_AUTH_SPOTIFY_KEY']
-SOCIAL_AUTH_SPOTIFY_SECRET = os.environ['SOCIAL_AUTH_SPOTIFY_SECRET']
+SOCIAL_AUTH_SPOTIFY_KEY = os.environ['SPOTIFY_AUTH_KEY']
+SOCIAL_AUTH_SPOTIFY_SECRET = os.environ['SPOTIFY_AUTH_SECRET']
 SOCIAL_AUTH_POSTGRES_JSONFIELD = True
-SOCIAL_AUTH_SPOTIFY_SCOPE = ['user-read-private', 'user-read-email', 'user-read-playback-state', 'user-top-read']
+SOCIAL_AUTH_SPOTIFY_SCOPE = ["user-read-currently-playing", "user-read-playback-state", "user-read-private", "user-read-email", "user-top-read", 'playlist-modify-public',]
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',

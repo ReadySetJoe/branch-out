@@ -27,8 +27,14 @@ class UserSocialAuthViewSet(viewsets.ViewSet):
     """
     A simple ViewSet for listing or retrieving UserSocialAuths.
     """
+
     def list(self, request):
         queryset = UserSocialAuth.objects.all()
+        serializer = UserSocialAuthSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def user(self, request):
+        queryset = UserSocialAuth.objects.filter(pk=request.user.pk)
         serializer = UserSocialAuthSerializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -37,7 +43,6 @@ class UserSocialAuthViewSet(viewsets.ViewSet):
         user = get_object_or_404(queryset, pk=pk)
         serializer = UserSocialAuthSerializer(user)
         return Response(serializer.data)
-
 
 # class BoardRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
 #     permission_classes = (IsOwnerOrReadOnly,)
