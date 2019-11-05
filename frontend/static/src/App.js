@@ -15,7 +15,7 @@ const spotifyApi = new SpotifyWebApi();
 const SK_AUTH_KEY = 'io09K9l3ebJxmxe2'
 
 // Debug Variables
-const API_LIMITER = true; // API Limiter (debug boolean ensuring limited API calling) 
+const API_LIMITER = false; // API Limiter (debug boolean ensuring limited API calling) 
 const SAVE_TO_LOCAL_STORAGE = true;
 
 class App extends React.Component {
@@ -68,6 +68,7 @@ class App extends React.Component {
 
       // Branch
       branch: [],
+      branches: [],
     };
     this.getNowPlaying = this.getNowPlaying.bind(this);
     this.useTopArtists = this.useTopArtists.bind(this);
@@ -95,6 +96,12 @@ class App extends React.Component {
             uid: res.data[0].uid,
             id: res.data[0].id,
           });
+          axios.get(`/api/v1/branches/`)
+          .then(res => {
+            // console.log(res)
+            this.setState({branches: res.data})
+          })
+          .catch(err => console.log(err))
           spotifyApi.setAccessToken(_token)
           this.getNowPlaying()
         })
@@ -261,16 +268,16 @@ class App extends React.Component {
               this.setState({ events_all: events_all })
 
               // Add all artists to state (COULD BE REFACTORED WITH MAP)
-              let i;
               let events_artists = [...this.state.events_artists];
-              for (i = 0; i < this.state.events_all.length; i++) {
+              for (let i = 0; i < this.state.events_all.length; i++) {
                 let e = this.state.events_all[i];
-                let j
-                for (j = 0; j < e.performance.length; j++) {
-                  events_artists.push(e.performance[j].artist)
+                for (let j = 0; j < e.performance.length; j++) {
+                  if (!events_artists.includes(e.performance[j].artist)) {
+                    events_artists.push(e.performance[j].artist)
+                  }
                 }
               }
-              console.log(events_all)
+              // console.log(events_all)
               this.setState({ events_artists: events_artists })
             })
             .catch(err => {
@@ -349,7 +356,7 @@ class App extends React.Component {
                 for (let k=0; k<limbs.length; k++) {
                   if (limbs[k].artist.name === e.performance[j].artist.displayName) {
                     limbs[k].event = e
-                    limbs.sort((a, b) => b.start.date - a.start.date)
+                    // limbs.sort((a, b) => b.event.start.date - a.event.start.date)
                   }
                 }
                 matches_also.splice(matches_also.indexOf(e.performance[j].artist.displayName),1)
@@ -371,7 +378,36 @@ class App extends React.Component {
   makeBranch() {
     let branch_data = new FormData();
     // branch_data.append('cover', this.state.image) // NEED HELP ON THIS
-    branch_data.append('created_by',this.state.uid) // NEED HELP ON THIS
+    let limbs = []
+    for (let i=0; i<this.state.limbs.length; i++) {
+      let limb = {
+        artist_url :this.state.limbs[i].artist.external_urls.spotify,
+        artist_id :this.state.limbs[i].artist.id,
+        artist_name :this.state.limbs[i].artist.name,
+        event_id :this.state.limbs[i].event.id,
+        event_name :this.state.limbs[i].event.displayName,
+        event_city :this.state.limbs[i].event.location.city,
+        event_date :this.state.limbs[i].event.start.date,
+        venue_name :this.state.limbs[i].event.venue.displayName,
+        venue_id :this.state.limbs[i].event.venue.id,
+        venue_url :this.state.limbs[i].event.venue.uri,
+        song_url :this.state.limbs[i].song.external_urls.spotify,
+        song_name :this.state.limbs[i].song.name,
+        song_preview_url :this.state.limbs[i].song.preview_url,
+      }
+      // console.log(limb)
+      // limb = JSON.stringify(limb)
+      // console.log(limb)
+      limbs.push(limb)
+      // console.log(limbs.length)
+    }
+    console.log(limbs)
+    limbs = JSON.stringify(limbs)
+    console.log(typeof limbs)
+    
+    branch_data.append('limbs', limbs)
+    // console.log(branch_data.get('limbs'))
+
     axios({
       method: 'post',
       url: '/api/v1/branch/',
@@ -380,35 +416,7 @@ class App extends React.Component {
         headers: {'Content-Type': 'multipart/form-data' }
       }
     })
-    .then(res => {
-      let branch_id = res.data.id // NEED HELP ON THIS
-      for (let i=0; i<this.state.limbs.length; i++) {
-        let limb_data = new FormData();
-        limb_data.append('artist_url',this.state.limbs[i].artist.external_urls[0])
-        limb_data.append('artist_id',this.state.limbs[i].artist.id)
-        limb_data.append('artist_name',this.state.limbs[i].artist.name)
-        limb_data.append('event_id',this.state.limbs[i].event.id)
-        limb_data.append('event_name',this.state.limbs[i].event.displayName)
-        limb_data.append('event_city',this.state.limbs[i].event.location.city)
-        limb_data.append('event_date',this.state.limbs[i].event.start.date)
-        limb_data.append('venue_name',this.state.limbs[i].event.venue.displayName)
-        limb_data.append('venue_id',this.state.limbs[i].event.venue.id)
-        limb_data.append('venue_url',this.state.limbs[i].event.venue.uri)
-        limb_data.append('song_url',this.state.limbs[i].song.external_urls[0])
-        limb_data.append('song_name',this.state.limbs[i].song.name)
-        limb_data.append('song_preview_url',this.state.limbs[i].song.preview_url)
-        limb_data.append('created_by', this.state.uid) // NEED HELP ON THIS
-        limb_data.append('branch', branch_id) // NEED HELP ON THIS
-        axios({
-          method: 'post',
-          url: 'api/v1/limb/',
-          data: limb_data,
-          config: {
-            headers: {'Content-Type': 'multipart/form-data'}
-          }
-        })
-      }
-    })
+    .then(res => console.log(res))
     .catch(err => console.log(err))
   }
 
@@ -436,6 +444,8 @@ class App extends React.Component {
     state.use_zipcode = this.state.use_zipcode;
     state.username = this.state.username;
     state.zipcode = this.state.zipcode;
+    state.uid = this.state.uid;
+    state.id = this.state.id;
     localStorage.setItem('state', JSON.stringify(state))
     console.log('State Saved!')
     console.log(state)
@@ -497,7 +507,7 @@ class App extends React.Component {
                 <h4 className="">Hey, {this.state.username}</h4>
                 
                 <div>
-                  <a href="/limbs/" className="btn m-2">My Limbs ({this.state.branch.length})</a>
+                  <a href="/my-branches/" className="btn m-2">My Branches ({this.state.branches.length})</a>
                   <a href="/logout/" className='btn-logout btn m-2'>Logout</a>
                 </div>
                 
@@ -620,7 +630,7 @@ class App extends React.Component {
           <br />
           {this.state.limbs.length > 0 && (
             <div>
-              <image alt="upload customized image for this branch"/>
+              <img alt="upload customized cover for this branch"/>
             {limbs_table}
             </div>)}
         </header>
