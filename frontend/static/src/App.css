@@ -97,6 +97,10 @@ body {
   margin: 0 auto;
 }
 
+.btn-logout {
+  background-color: #282c34;
+}
+
 /** Background **/
 
 .background {

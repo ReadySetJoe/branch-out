@@ -19,7 +19,7 @@ const spotifyApi = new SpotifyWebApi();
 let SK_AUTH_KEY = 'io09K9l3ebJxmxe2'
 
 // API Limiter (debug boolean ensuring limited API calling) 
-const API_LIMITER = false;
+const API_LIMITER = true;
 
 class App extends React.Component {
   constructor(props) {
@@ -62,11 +62,11 @@ class App extends React.Component {
       events: [],
       // Matches
       matches: [],
-      // Songs
-      songs: [],
 
       // Limbs
-      limbs: [],
+      limbs: [
+        // {artist: {}, event: {}, song: {},},
+      ],
 
     };
     this.getNowPlaying = this.getNowPlaying.bind(this);
@@ -79,20 +79,20 @@ class App extends React.Component {
   }
 
   componentDidMount() {
+    // Reloads user, based on token stored in state
     if (!this.state.token) {
-      let _token
       axios.get(`/api/v1/user-social-auth/`)
         .then(res => {
-          _token = res.data[0].extra_data.access_token
-          this.setState({
-            token: _token
-          });
+          let _token = res.data[0].extra_data.access_token
+          this.setState({token: _token});
           spotifyApi.setAccessToken(_token)
           this.getNowPlaying()
         })
         .catch(err => {
           console.log(err)
         })
+    } else {
+      this.getNowPlaying()
     }
   }
 
@@ -129,21 +129,16 @@ class App extends React.Component {
   useNowPlaying() {
     spotifyApi.getArtistRelatedArtists(this.state.item.artists[0].id)
       .then(data => {
+        let root_artists = data.artists
+        root_artists.unshift(this.state.item.artists[0])  
         this.setState({
-          root_artists: data.artists,
+          root_artists: root_artists,
           use_now_playing: true,
           use_top_artists: false
         })
         console.log(data)
       })
       .catch(err => console.log(err))
-    spotifyApi.getArtist(this.state.item.artists[0].id)
-      .then(data => {
-        console.log(data)
-      })
-      .catch(err => {
-        console.log(err)
-      })
   }
 
   useTopArtists() {
@@ -186,6 +181,7 @@ class App extends React.Component {
   }
 
   selectArtist(artist) {
+    // Handles selected root artist toggling
     if (!this.state.root_artists_selected.includes(artist)) {
       let _selected = [...this.state.root_artists_selected]
       _selected.push(artist)
@@ -202,9 +198,6 @@ class App extends React.Component {
     let self = this;
     navigator.geolocation.getCurrentPosition(
       function success(position) {
-        console.log('latitude', position.coords.latitude,
-          'longitude', position.coords.longitude);
-
         self.setState({
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
@@ -219,49 +212,10 @@ class App extends React.Component {
   findEvents() {
     axios({
       method: 'get',
-      // url: `https://api.songkick.com/api/3.0/artists/308396/similar_artists.json?apikey=${SOMEGUYS_API_KEY}`,
       url: `https://api.songkick.com/api/3.0/events.json?apikey=${SK_AUTH_KEY}&location=geo:${this.state.latitude},${this.state.longitude}&page=1`,
     })
       .then(res => {
-        console.log(res)
         this.setState({ events_all: res.data.resultsPage.results.event })
-        if (res.data.resultsPage.totalEntries > res.data.resultsPage.results.event.length & !API_LIMITER) {
-          const total_entries = res.data.resultsPage.totalEntries
-          const per_page = res.data.resultsPage.perPage
-          console.log(`There are ${total_entries} results and ${per_page} on each page`)
-          console.log(`Which means the site needs to make ${Math.ceil(total_entries / per_page)} calls total`)
-          console.log(`and the last call should have ${total_entries % per_page} entries`)
-          const num_calls = Math.ceil(total_entries / per_page)
-          let i
-          for (i = 1; i < num_calls; i++) {
-            axios({
-              method: 'get',
-              // url: `https://api.songkick.com/api/3.0/artists/308396/similar_artists.json?apikey=${SOMEGUYS_API_KEY}`,
-              url: `https://api.songkick.com/api/3.0/events.json?apikey=${SK_AUTH_KEY}&location=geo:${this.state.latitude},${this.state.longitude}&page=${i + 1}`,
-              // eslint-disable-next-line no-loop-func
-            }).then(res => {
-              let events_all = [...this.state.events_all]
-              events_all = events_all.concat(res.data.resultsPage.results.event)
-              this.setState({ events_all: events_all })
-
-              let i;
-              let events_artists = [...this.state.events_artists];
-              for (i = 0; i < this.state.events_all.length; i++) {
-                let e = this.state.events_all[i];
-                let j
-                for (j = 0; j < e.performance.length; j++) {
-                  if (!events_artists.includes(e.performance[j].artist)) {
-                    events_artists.push(e.performance[j].artist)
-                  }
-                }
-              }
-              this.setState({ events_artists: events_artists })
-            })
-              .catch(err => {
-                console.log(err)
-              })
-          }
-        }
         let i;
         let events_artists = [...this.state.events_artists];
         for (i = 0; i < this.state.events_all.length; i++) {
@@ -272,7 +226,49 @@ class App extends React.Component {
           }
         }
         this.setState({ events_artists: events_artists })
-        // console.log({events_artists})
+
+
+        // If more than 50 events are available, and the first page didn't contain them all
+        if (res.data.resultsPage.totalEntries > res.data.resultsPage.results.event.length & !API_LIMITER) {
+          const total_entries = res.data.resultsPage.totalEntries
+          const per_page = res.data.resultsPage.perPage
+          console.log(`There are ${total_entries} results and ${per_page} on each page`)
+          console.log(`Which means the site needs to make ${Math.ceil(total_entries / per_page)} calls total`)
+          console.log(`and the last call should have ${total_entries % per_page} entries`)
+          const num_calls = Math.ceil(total_entries / per_page)
+          let i
+          for (i = 1; i < num_calls; i++) {
+            // Call the next page
+            axios({
+              method: 'get',
+              url: `https://api.songkick.com/api/3.0/events.json?apikey=${SK_AUTH_KEY}&location=geo:${this.state.latitude},${this.state.longitude}&page=${i+1}`,
+              // eslint-disable-next-line no-loop-func
+            })
+            .then(res => {
+              // Add the events to state
+              let events_all = [...this.state.events_all]
+              events_all = events_all.concat(res.data.resultsPage.results.event)
+              this.setState({ events_all: events_all })
+
+              // Add all artists to state (COULD BE REFACTORED WITH MAP)
+              let i;
+              let events_artists = [...this.state.events_artists];
+              for (i = 0; i < this.state.events_all.length; i++) {
+                let e = this.state.events_all[i];
+                let j
+                for (j = 0; j < e.performance.length; j++) {
+                  events_artists.push(e.performance[j].artist)
+                }
+              }
+              console.log(events_all)
+              this.setState({ events_artists: events_artists })
+            })
+            .catch(err => {
+              console.log(err)
+            })
+          }
+        }
+        console.log({events_artists})
       })
       .catch(err => {
         console.log(err)
@@ -307,6 +303,11 @@ class App extends React.Component {
     const artists_all_unique = [...new Set(artists_all.map(x => x.name))];
     console.log(`${artists_all_unique.length} are unique`)
 
+    // this.setState({
+    //   events_artists: events_artists_unique,
+    //   artists_all: artists_all_unique
+    // })
+
     let i, j, a, b, matches = [];
     for (i = 0; i < artists_all_unique.length; i++) {
       a = artists_all_unique[i];
@@ -320,6 +321,52 @@ class App extends React.Component {
     console.log(`and there are ${matches.length} matches`)
     console.log(matches)
     this.setState({ matches: matches })
+  }
+
+  makeLimbs() {
+    let j = 0;
+    let matches = [...this.state.matches]
+    let limbs = []
+
+    while (matches.length && j<this.state.artists_all.length) {
+      let a = this.state.artists_all[j]
+      if (matches.includes(a.name)) {
+        spotifyApi.getArtistTopTracks(a.id, "ES")
+        .then(res => {
+          limbs.push({artist: a, song: res.tracks[0]})
+          let i = 0;
+          let matches_also = [...this.state.matches]
+      
+          while (matches_also.length && i<this.state.events_all.length) {
+            let e = this.state.events_all[i]
+            for (let j=0; j<e.performance.length; j++) {
+              if (matches_also.includes(e.performance[j].artist.displayName)) {
+                for (let k=0; k<limbs.length; k++) {
+                  if (limbs[k].artist.name === e.performance[j].artist.displayName) {
+                    limbs[k].event = e
+                  }
+                }
+                matches_also.splice(matches_also.indexOf(e.performance[j].artist.displayName),1)
+              }
+            }
+            i++;
+          }
+      
+          console.log(limbs)
+          this.setState({limbs:limbs})
+        })
+        .catch(err => console.log(err))
+        matches.splice(matches.indexOf(a.name),1)
+      }
+      j++;
+    }
+
+  
+    
+    
+    
+      
+
   }
 
   render() {
@@ -344,9 +391,12 @@ class App extends React.Component {
           <nav className="scrollspy-placeholder"><ul></ul></nav>
           {this.state.token && (
             <div className="position-fixed fixed-top d-flex flex-row-reverse">
-              <a href="/logout/" className='logout-btn btn m-3'>Logout</a>
+              <a href="/logout/" className='btn-logout btn m-3'>Logout</a>
             </div>
           )}
+          <br />
+          <br />
+          <br />
 
           {!this.state.token && (
             <div>
@@ -443,12 +493,16 @@ class App extends React.Component {
             <button className="btn" onClick={() => this.findEvents()}>Find Events</button>
             # of events found: {this.state.events_all.length} <br />
             # of artist from those events: {this.state.events_artists.length}
-            <button className="btn" onClick={() => this.findArtists()}>Find Artists</button>
             <br />
+            <button className="btn" onClick={() => this.findArtists()}>Find Artists</button>
             # of artists found: {this.state.artists_all.length}
             <br />
             <button className="btn" onClick={() => this.findMatches()}>Find Matches</button>
             # of matches found: {this.state.matches.length}
+            <br />
+            <button className="btn" onClick={() => this.makeLimbs()}>Make Limbs</button>
+            # of limbs made: {this.state.limbs.length}
+
 
           </div>
 
