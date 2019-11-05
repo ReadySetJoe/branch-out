@@ -15,7 +15,7 @@ const spotifyApi = new SpotifyWebApi();
 const SK_AUTH_KEY = 'io09K9l3ebJxmxe2'
 
 // Debug Variables
-const API_LIMITER = false; // API Limiter (debug boolean ensuring limited API calling) 
+const API_LIMITER = true; // API Limiter (debug boolean ensuring limited API calling) 
 const SAVE_TO_LOCAL_STORAGE = true;
 
 class App extends React.Component {
@@ -24,6 +24,8 @@ class App extends React.Component {
     this.state = {
       token: null,
       username: '',
+      uid: '',
+      id: '',
 
       // Now Playing
       item: {
@@ -74,6 +76,8 @@ class App extends React.Component {
     this.useMyLocation = this.useMyLocation.bind(this);
     this.findEvents = this.findEvents.bind(this);
     this.addNowPlayingToList = this.addNowPlayingToList.bind(this);
+    this.makeLimbs = this.makeLimbs.bind(this);
+    this.makeBranch = this.makeBranch.bind(this);
     this.save = this.save.bind(this);
     this.load = this.load.bind(this);
   }
@@ -88,6 +92,8 @@ class App extends React.Component {
           this.setState({
             token: _token,
             username: res.data[0].user.first_name,
+            uid: res.data[0].uid,
+            id: res.data[0].id,
           });
           spotifyApi.setAccessToken(_token)
           this.getNowPlaying()
@@ -307,11 +313,6 @@ class App extends React.Component {
     const artists_all_unique = [...new Set(artists_all.map(x => x.name))];
     console.log(`${artists_all_unique.length} are unique`)
 
-    // this.setState({
-    //   events_artists: events_artists_unique,
-    //   artists_all: artists_all_unique
-    // })
-
     let i, j, a, b, matches = [];
     for (i = 0; i < artists_all_unique.length; i++) {
       a = artists_all_unique[i];
@@ -367,6 +368,50 @@ class App extends React.Component {
     }
   }
 
+  makeBranch() {
+    let branch_data = new FormData();
+    // branch_data.append('cover', this.state.image) // NEED HELP ON THIS
+    branch_data.append('created_by',this.state.uid) // NEED HELP ON THIS
+    axios({
+      method: 'post',
+      url: '/api/v1/branch/',
+      data: branch_data,
+      config: { 
+        headers: {'Content-Type': 'multipart/form-data' }
+      }
+    })
+    .then(res => {
+      let branch_id = res.data.id // NEED HELP ON THIS
+      for (let i=0; i<this.state.limbs.length; i++) {
+        let limb_data = new FormData();
+        limb_data.append('artist_url',this.state.limbs[i].artist.external_urls[0])
+        limb_data.append('artist_id',this.state.limbs[i].artist.id)
+        limb_data.append('artist_name',this.state.limbs[i].artist.name)
+        limb_data.append('event_id',this.state.limbs[i].event.id)
+        limb_data.append('event_name',this.state.limbs[i].event.displayName)
+        limb_data.append('event_city',this.state.limbs[i].event.location.city)
+        limb_data.append('event_date',this.state.limbs[i].event.start.date)
+        limb_data.append('venue_name',this.state.limbs[i].event.venue.displayName)
+        limb_data.append('venue_id',this.state.limbs[i].event.venue.id)
+        limb_data.append('venue_url',this.state.limbs[i].event.venue.uri)
+        limb_data.append('song_url',this.state.limbs[i].song.external_urls[0])
+        limb_data.append('song_name',this.state.limbs[i].song.name)
+        limb_data.append('song_preview_url',this.state.limbs[i].song.preview_url)
+        limb_data.append('created_by', this.state.uid) // NEED HELP ON THIS
+        limb_data.append('branch', branch_id) // NEED HELP ON THIS
+        axios({
+          method: 'post',
+          url: 'api/v1/limb/',
+          data: limb_data,
+          config: {
+            headers: {'Content-Type': 'multipart/form-data'}
+          }
+        })
+      }
+    })
+    .catch(err => console.log(err))
+  }
+
   save() {
     let state = {}
     state.token = this.state.token;
@@ -414,7 +459,6 @@ class App extends React.Component {
     )
 
     let limbs = this.state.limbs.map((limb, id) =>
-      // <div key={id} className="limb d-flex flex-row justify-content-around">
       <div key={id} className="limb d-flex">
         <div className="col-1">{id+1}</div>
         <div className="col-3 text-left">{limb.artist.name}</div>
@@ -570,13 +614,15 @@ class App extends React.Component {
             <button className="btn" onClick={() => this.makeLimbs()}>Make Limbs</button>
             # of limbs made: {this.state.limbs.length}
             <br />
-            {this.state.limbs.length > 0 && (limbs_table)}
-            <br />
             <button className="btn" onClick={() => this.makeBranch()}>Make Branch</button>
             <br />
-
-
           </div>
+          <br />
+          {this.state.limbs.length > 0 && (
+            <div>
+              <image alt="upload customized image for this branch"/>
+            {limbs_table}
+            </div>)}
         </header>
       </div>
     );

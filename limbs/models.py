@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
+from branches.models import Branch
+
 User = get_user_model()
 
 
@@ -21,6 +23,7 @@ class Limb(models.Model):
     song_url = models.CharField(max_length=255)
     song_name = models.CharField(max_length=255)
     song_preview_url = models.CharField(max_length=255)
+    branch = models.ForeignKey(Branch, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.event_name
+        return self.event_name + " created at " + str(self.created_at)

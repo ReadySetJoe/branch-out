@@ -9,8 +9,10 @@ from . import views
 # urlpatterns = router.urls
 
 urlpatterns = [
-    # path('boards/<int:pk>/', views.BoardRetrieveUpdateDestroyAPIView.as_view(), name='board_create'),
-    # path('songs/', views.SongListCreateAPIView.as_view(), name='song_create'),
+    path('limb/', views.LimbListCreateAPIView.as_view(), name='limb_create'),
+    path('branch/', views.BranchListCreateAPIView.as_view(), name='branch_create'),
+    path('branch/<int:pk>/', views.BranchRetrieveUpdateDestroyAPIView.as_view(), name='branch_retrieve_update_destroy'),
+
     # path('user-social-auth/', views.UserSocialAuthRetrieveAPIView.as_view(), name='retrieve'),
     path('user-social-auth/', views.UserSocialAuthViewSet.as_view({'get': 'user'})),
 ]

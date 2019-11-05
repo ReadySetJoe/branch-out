@@ -10,4 +10,5 @@ class Branch(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
 
-
+    def __str__(self):
+        return str(self.created_by) + " created at " + str(self.created_at)

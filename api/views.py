@@ -7,14 +7,21 @@ from django.shortcuts import get_object_or_404
 from social_django.models import UserSocialAuth
 
 from .permissions import IsOwnerOrReadOnly
-from .serializers import LimbSerializer, UserSocialAuthSerializer
+from .serializers import UserSocialAuthSerializer, LimbSerializer, BranchSerializer
 from limbs.models import Limb
+from branches.models import Branch
 
 
 class LimbListCreateAPIView(generics.ListCreateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
     queryset = Limb.objects.all()
     serializer_class = LimbSerializer
+
+
+class BranchListCreateAPIView(generics.ListCreateAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = Branch.objects.all()
+    serializer_class = BranchSerializer
 
 
 class UserSocialAuthRetrieveAPIView(generics.RetrieveAPIView):
@@ -44,18 +51,11 @@ class UserSocialAuthViewSet(viewsets.ViewSet):
         serializer = UserSocialAuthSerializer(user)
         return Response(serializer.data)
 
-# class BoardRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
-#     permission_classes = (IsOwnerOrReadOnly,)
-#     queryset = Board.objects.all()
-#     serializer_class = BoardSerializer
-#
-#     def perform_create(self, serializer):
-#         serializer.save(created_by=self.request.user)
-#
-#
-# # class BoardViewSet(viewsets.ModelViewSet):
-# #     permission_classes = (IsOwnerOrReadOnly,)
-# #     queryset = Board.objects.all()
-# #     serializer_class = BoardSerializer
-#
-#
+
+class BranchRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = (IsOwnerOrReadOnly,)
+    queryset = Branch.objects.all()
+    serializer_class = BranchSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
