@@ -66,8 +66,8 @@ class App extends React.Component {
       // Limbs
       limbs: [],
 
-      // Branches
-      branches: [],
+      // Branch
+      branch: [],
     };
     this.getNowPlaying = this.getNowPlaying.bind(this);
     this.useTopArtists = this.useTopArtists.bind(this);
@@ -497,7 +497,7 @@ class App extends React.Component {
                 <h4 className="">Hey, {this.state.username}</h4>
                 
                 <div>
-                  <a href="/limbs/" className="btn m-2">My Limbs ({this.state.limbs.length})</a>
+                  <a href="/limbs/" className="btn m-2">My Limbs ({this.state.branch.length})</a>
                   <a href="/logout/" className='btn-logout btn m-2'>Logout</a>
                 </div>
                 
