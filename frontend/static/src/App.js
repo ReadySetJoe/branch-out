@@ -1,14 +1,10 @@
 import React from 'react';
 import axios from 'axios';
-import * as os from 'os';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSync } from '@fortawesome/free-solid-svg-icons';
-// import Geocode from 'react-geocode';
-// import Geohash from 'https://cdn.jsdelivr.net/npm/latlon-geohash@2.0.0';
 
 import SpotifyWebApi from 'spotify-web-api-js';
 import Player from "./Player";
-// import Navigator from "./Navigator";
 import './App.css';
 
 axios.defaults.xsrfCookieName = 'csrftoken';
@@ -16,16 +12,18 @@ axios.defaults.xsrfHeaderName = 'X-CSRFToken';
 
 const spotifyApi = new SpotifyWebApi();
 
-let SK_AUTH_KEY = 'io09K9l3ebJxmxe2'
+const SK_AUTH_KEY = 'io09K9l3ebJxmxe2'
 
-// API Limiter (debug boolean ensuring limited API calling) 
-const API_LIMITER = true;
+// Debug Variables
+const API_LIMITER = false; // API Limiter (debug boolean ensuring limited API calling) 
+const SAVE_TO_LOCAL_STORAGE = true;
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       token: null,
+      username: '',
 
       // Now Playing
       item: {
@@ -64,10 +62,10 @@ class App extends React.Component {
       matches: [],
 
       // Limbs
-      limbs: [
-        // {artist: {}, event: {}, song: {},},
-      ],
+      limbs: [],
 
+      // Branches
+      branches: [],
     };
     this.getNowPlaying = this.getNowPlaying.bind(this);
     this.useTopArtists = this.useTopArtists.bind(this);
@@ -76,6 +74,8 @@ class App extends React.Component {
     this.useMyLocation = this.useMyLocation.bind(this);
     this.findEvents = this.findEvents.bind(this);
     this.addNowPlayingToList = this.addNowPlayingToList.bind(this);
+    this.save = this.save.bind(this);
+    this.load = this.load.bind(this);
   }
 
   componentDidMount() {
@@ -83,8 +83,12 @@ class App extends React.Component {
     if (!this.state.token) {
       axios.get(`/api/v1/user-social-auth/`)
         .then(res => {
+          console.log(res)
           let _token = res.data[0].extra_data.access_token
-          this.setState({token: _token});
+          this.setState({
+            token: _token,
+            username: res.data[0].user.first_name,
+          });
           spotifyApi.setAccessToken(_token)
           this.getNowPlaying()
         })
@@ -344,6 +348,7 @@ class App extends React.Component {
                 for (let k=0; k<limbs.length; k++) {
                   if (limbs[k].artist.name === e.performance[j].artist.displayName) {
                     limbs[k].event = e
+                    limbs.sort((a, b) => b.start.date - a.start.date)
                   }
                 }
                 matches_also.splice(matches_also.indexOf(e.performance[j].artist.displayName),1)
@@ -360,13 +365,42 @@ class App extends React.Component {
       }
       j++;
     }
+  }
 
-  
-    
-    
-    
-      
+  save() {
+    let state = {}
+    state.token = this.state.token;
+    state.artists = this.state.artists;
+    state.artists_all = this.state.artists_all;
+    state.events = this.state.events;
+    state.events_all = this.state.events_all;
+    state.events_artists = this.state.events_artists;
+    state.is_playing = this.state.is_playing;
+    state.item = this.state.item;
+    state.latitude = this.state.latitude;
+    state.limbs = this.state.limbs;
+    state.longitude = this.state.longitude;
+    state.matches = this.state.matches;
+    state.progress_ms = this.state.progress_ms;
+    state.root_artists = this.state.root_artists;
+    state.root_artists_selected = this.state.root_artists_selected;
+    state.root_artists_selection_complete = this.state.root_artists_selection_complete;
+    state.use_latlong = this.state.use_latlong;
+    state.use_now_playing = this.state.use_now_playing;
+    state.use_top_artists = this.state.use_top_artists;
+    state.use_zipcode = this.state.use_zipcode;
+    state.username = this.state.username;
+    state.zipcode = this.state.zipcode;
+    localStorage.setItem('state', JSON.stringify(state))
+    console.log('State Saved!')
+    console.log(state)
+  }
 
+  load() {
+    let state = JSON.parse(localStorage.getItem('state'))
+    this.setState(state)
+    console.log('State Loaded!')
+    console.log(state)
   }
 
   render() {
@@ -380,20 +414,53 @@ class App extends React.Component {
     )
 
     let limbs = this.state.limbs.map((limb, id) =>
-      <div key={id} className="m-2">
-        {limb.something}
+      // <div key={id} className="limb d-flex flex-row justify-content-around">
+      <div key={id} className="limb d-flex">
+        <div className="col-1">{id+1}</div>
+        <div className="col-3 text-left">{limb.artist.name}</div>
+        <div className="col-4 text-left">{limb.song.name}</div>
+        <div className="col-2">{limb.event.location.city}</div>
+        <div className="col-2">{limb.event.start.date}</div>
       </div>
     )
+
+    let limbs_table = 
+      <div className="limbs">
+        <div className="limb font-weight-bolder">
+          <div className="col-1">#</div>
+          <div className="col-3 text-left">Artist</div>
+          <div className="col-4 text-left">Top Song</div>
+          <div className="col-2">City</div>
+          <div className="col-2">Date</div>
+        </div>
+        {limbs}
+      </div>
 
     return (
       <div className="App">
         <header className="App-header">
-          <nav className="scrollspy-placeholder"><ul></ul></nav>
-          {this.state.token && (
-            <div className="position-fixed fixed-top d-flex flex-row-reverse">
-              <a href="/logout/" className='btn-logout btn m-3'>Logout</a>
+          {SAVE_TO_LOCAL_STORAGE && (
+            <div style={{ position: "fixed", bottom: 5, right: 5, }}>
+              <button className='btn' onClick={() => this.save()}>save</button>
+              <button className='btn' onClick={() => this.load()}>load</button>
             </div>
           )}
+          <h1 className="title">branch.out</h1>
+          <nav className="scrollspy-placeholder fixed-left"><ul></ul></nav>
+          {this.state.token && (
+            <div>
+              <div className="top-bar fixed-top d-flex align-items-center justify-content-between p-2">
+                <h4 className="">Hey, {this.state.username}</h4>
+                
+                <div>
+                  <a href="/limbs/" className="btn m-2">My Limbs ({this.state.limbs.length})</a>
+                  <a href="/logout/" className='btn-logout btn m-2'>Logout</a>
+                </div>
+                
+              </div>
+            </div>
+          )}
+          
           <br />
           <br />
           <br />
@@ -502,15 +569,14 @@ class App extends React.Component {
             <br />
             <button className="btn" onClick={() => this.makeLimbs()}>Make Limbs</button>
             # of limbs made: {this.state.limbs.length}
+            <br />
+            {this.state.limbs.length > 0 && (limbs_table)}
+            <br />
+            <button className="btn" onClick={() => this.makeBranch()}>Make Branch</button>
+            <br />
 
 
           </div>
-
-          {this.state.matches.length > 0 && (
-            <div className="">
-              {limbs}
-            </div>)}
-
         </header>
       </div>
     );
