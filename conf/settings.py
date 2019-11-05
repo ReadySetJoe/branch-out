@@ -48,17 +48,14 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_auth',
     'rest_auth.registration',
-    'allauth',  # new
-    # 'allauth.account',  # new
-    # 'allauth.socialaccount',  # new
+    'allauth',
     'social_django',
 
     # local
     'api',
     'frontend',
     'limbs',
-    'events',
-    'songs',
+    'branches',
 ]
 
 REST_FRAMEWORK = {
@@ -217,7 +214,6 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.user.create_user',
     'social_core.pipeline.social_auth.associate_user',
     'social_core.pipeline.social_auth.load_extra_data',
-    # 'api.views.register_by_access_token',  # <--- set the path to the function
     'social_core.pipeline.user.user_details',
 )
 

@@ -1,14 +1,14 @@
 from rest_framework import serializers
 from social_django.models import UserSocialAuth
 
-from songs.models import Song
+from limbs.models import Limb
 
 
-class SongSerializer(serializers.ModelSerializer):
+class LimbSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Song
+        model = Limb
         depth = 1
-        fields = ['title', 'artist', 'track_number', 'url', 'duration_ms']
+        fields = '__all__'
 
 
 class UserSocialAuthSerializer(serializers.ModelSerializer):

@@ -7,14 +7,14 @@ from django.shortcuts import get_object_or_404
 from social_django.models import UserSocialAuth
 
 from .permissions import IsOwnerOrReadOnly
-from .serializers import SongSerializer, UserSocialAuthSerializer
-from songs.models import Song
+from .serializers import LimbSerializer, UserSocialAuthSerializer
+from limbs.models import Limb
 
 
-class SongListCreateAPIView(generics.ListCreateAPIView):
+class LimbListCreateAPIView(generics.ListCreateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
-    queryset = Song.objects.all()
-    serializer_class = SongSerializer
+    queryset = Limb.objects.all()
+    serializer_class = LimbSerializer
 
 
 class UserSocialAuthRetrieveAPIView(generics.RetrieveAPIView):
