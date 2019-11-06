@@ -2,6 +2,8 @@ import React from 'react';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSync } from '@fortawesome/free-solid-svg-icons';
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
 
 import SpotifyWebApi from 'spotify-web-api-js';
 import Player from "./Player";
@@ -68,7 +70,11 @@ class App extends React.Component {
 
       // Branch
       branch: [],
-      branches: [],
+
+      // Database
+      limbs_user: [],
+      branches_user: [],
+      show_modal: false,
     };
     this.getNowPlaying = this.getNowPlaying.bind(this);
     this.useTopArtists = this.useTopArtists.bind(this);
@@ -89,21 +95,24 @@ class App extends React.Component {
       axios.get(`/api/v1/user-social-auth/`)
         .then(res => {
           console.log(res)
-          let _token = res.data[0].extra_data.access_token
+          spotifyApi.setAccessToken(res.data[0].extra_data.access_token)
+          this.getNowPlaying()
           this.setState({
-            token: _token,
+            token: res.data[0].extra_data.access_token,
             username: res.data[0].user.first_name,
             uid: res.data[0].uid,
             id: res.data[0].id,
           });
           axios.get(`/api/v1/branches/`)
-          .then(res => {
-            // console.log(res)
-            this.setState({branches: res.data})
-          })
-          .catch(err => console.log(err))
-          spotifyApi.setAccessToken(_token)
-          this.getNowPlaying()
+            .then(res => {
+              console.log(res)
+              this.setState({ branches_user: res.data })
+            })
+            .catch(err => console.log(err))
+
+          axios.get(`/api/v1/limbs/`)
+            .then(res => { console.log(res) })
+            .catch(err => { console.log(err) })
         })
         .catch(err => {
           console.log(err)
@@ -147,7 +156,7 @@ class App extends React.Component {
     spotifyApi.getArtistRelatedArtists(this.state.item.artists[0].id)
       .then(data => {
         let root_artists = data.artists
-        root_artists.unshift(this.state.item.artists[0])  
+        root_artists.unshift(this.state.item.artists[0])
         this.setState({
           root_artists: root_artists,
           use_now_playing: true,
@@ -258,34 +267,34 @@ class App extends React.Component {
             // Call the next page
             axios({
               method: 'get',
-              url: `https://api.songkick.com/api/3.0/events.json?apikey=${SK_AUTH_KEY}&location=geo:${this.state.latitude},${this.state.longitude}&page=${i+1}`,
+              url: `https://api.songkick.com/api/3.0/events.json?apikey=${SK_AUTH_KEY}&location=geo:${this.state.latitude},${this.state.longitude}&page=${i + 1}`,
               // eslint-disable-next-line no-loop-func
             })
-            .then(res => {
-              // Add the events to state
-              let events_all = [...this.state.events_all]
-              events_all = events_all.concat(res.data.resultsPage.results.event)
-              this.setState({ events_all: events_all })
+              .then(res => {
+                // Add the events to state
+                let events_all = [...this.state.events_all]
+                events_all = events_all.concat(res.data.resultsPage.results.event)
+                this.setState({ events_all: events_all })
 
-              // Add all artists to state (COULD BE REFACTORED WITH MAP)
-              let events_artists = [...this.state.events_artists];
-              for (let i = 0; i < this.state.events_all.length; i++) {
-                let e = this.state.events_all[i];
-                for (let j = 0; j < e.performance.length; j++) {
-                  if (!events_artists.includes(e.performance[j].artist)) {
-                    events_artists.push(e.performance[j].artist)
+                // Add all artists to state (COULD BE REFACTORED WITH MAP)
+                let events_artists = [...this.state.events_artists];
+                for (let i = 0; i < this.state.events_all.length; i++) {
+                  let e = this.state.events_all[i];
+                  for (let j = 0; j < e.performance.length; j++) {
+                    if (!events_artists.includes(e.performance[j].artist)) {
+                      events_artists.push(e.performance[j].artist)
+                    }
                   }
                 }
-              }
-              // console.log(events_all)
-              this.setState({ events_artists: events_artists })
-            })
-            .catch(err => {
-              console.log(err)
-            })
+                // console.log(events_all)
+                this.setState({ events_artists: events_artists })
+              })
+              .catch(err => {
+                console.log(err)
+              })
           }
         }
-        console.log({events_artists})
+        console.log({ events_artists })
       })
       .catch(err => {
         console.log(err)
@@ -340,36 +349,37 @@ class App extends React.Component {
     let matches = [...this.state.matches]
     let limbs = []
 
-    while (matches.length && j<this.state.artists_all.length) {
+    while (matches.length && j < this.state.artists_all.length) {
       let a = this.state.artists_all[j]
       if (matches.includes(a.name)) {
         spotifyApi.getArtistTopTracks(a.id, "ES")
-        .then(res => {
-          limbs.push({artist: a, song: res.tracks[0]})
-          let i = 0;
-          let matches_also = [...this.state.matches]
-      
-          while (matches_also.length && i<this.state.events_all.length) {
-            let e = this.state.events_all[i]
-            for (let j=0; j<e.performance.length; j++) {
-              if (matches_also.includes(e.performance[j].artist.displayName)) {
-                for (let k=0; k<limbs.length; k++) {
-                  if (limbs[k].artist.name === e.performance[j].artist.displayName) {
-                    limbs[k].event = e
-                    // limbs.sort((a, b) => b.event.start.date - a.event.start.date)
+          .then(res => {
+            limbs.push({ artist: a, song: res.tracks[0] })
+            let i = 0;
+            let matches_also = [...this.state.matches]
+
+            while (matches_also.length && i < this.state.events_all.length) {
+              let e = this.state.events_all[i]
+              for (let j = 0; j < e.performance.length; j++) {
+                if (matches_also.includes(e.performance[j].artist.displayName)) {
+                  for (let k = 0; k < limbs.length; k++) {
+                    if (limbs[k].artist.name === e.performance[j].artist.displayName) {
+                      limbs[k].event = e
+                      console.log(e)
+                      // limbs.sort((a, b) => b.event.start.date - a.event.start.date)
+                    }
                   }
+                  matches_also.splice(matches_also.indexOf(e.performance[j].artist.displayName), 1)
                 }
-                matches_also.splice(matches_also.indexOf(e.performance[j].artist.displayName),1)
               }
+              i++;
             }
-            i++;
-          }
-      
-          console.log(limbs)
-          this.setState({limbs:limbs})
-        })
-        .catch(err => console.log(err))
-        matches.splice(matches.indexOf(a.name),1)
+
+            console.log(limbs)
+            this.setState({ limbs: limbs })
+          })
+          .catch(err => console.log(err))
+        matches.splice(matches.indexOf(a.name), 1)
       }
       j++;
     }
@@ -379,45 +389,39 @@ class App extends React.Component {
     let branch_data = new FormData();
     // branch_data.append('cover', this.state.image) // NEED HELP ON THIS
     let limbs = []
-    for (let i=0; i<this.state.limbs.length; i++) {
+    for (let i = 0; i < this.state.limbs.length; i++) {
       let limb = {
-        artist_url :this.state.limbs[i].artist.external_urls.spotify,
-        artist_id :this.state.limbs[i].artist.id,
-        artist_name :this.state.limbs[i].artist.name,
-        event_id :this.state.limbs[i].event.id,
-        event_name :this.state.limbs[i].event.displayName,
-        event_city :this.state.limbs[i].event.location.city,
-        event_date :this.state.limbs[i].event.start.date,
-        venue_name :this.state.limbs[i].event.venue.displayName,
-        venue_id :this.state.limbs[i].event.venue.id,
-        venue_url :this.state.limbs[i].event.venue.uri,
-        song_url :this.state.limbs[i].song.external_urls.spotify,
-        song_name :this.state.limbs[i].song.name,
-        song_preview_url :this.state.limbs[i].song.preview_url,
+        artist_url: this.state.limbs[i].artist.external_urls.spotify,
+        artist_id: this.state.limbs[i].artist.id,
+        artist_name: this.state.limbs[i].artist.name,
+        event_id: this.state.limbs[i].event.id,
+        event_uri: this.state.limbs[i].event.uri,
+        event_name: this.state.limbs[i].event.displayName,
+        event_city: this.state.limbs[i].event.location.city,
+        event_date: this.state.limbs[i].event.start.date,
+        venue_name: this.state.limbs[i].event.venue.displayName,
+        venue_id: this.state.limbs[i].event.venue.id,
+        venue_url: this.state.limbs[i].event.venue.uri,
+        song_url: this.state.limbs[i].song.external_urls.spotify,
+        song_name: this.state.limbs[i].song.name,
+        song_preview_url: this.state.limbs[i].song.preview_url,
       }
-      // console.log(limb)
-      // limb = JSON.stringify(limb)
-      // console.log(limb)
       limbs.push(limb)
-      // console.log(limbs.length)
     }
-    console.log(limbs)
     limbs = JSON.stringify(limbs)
-    console.log(typeof limbs)
-    
+
     branch_data.append('limbs', limbs)
-    // console.log(branch_data.get('limbs'))
 
     axios({
       method: 'post',
       url: '/api/v1/branch/',
       data: branch_data,
-      config: { 
-        headers: {'Content-Type': 'multipart/form-data' }
+      config: {
+        headers: { 'Content-Type': 'multipart/form-data' }
       }
     })
-    .then(res => console.log(res))
-    .catch(err => console.log(err))
+      .then(res => console.log(res))
+      .catch(err => console.log(err))
   }
 
   save() {
@@ -446,6 +450,7 @@ class App extends React.Component {
     state.zipcode = this.state.zipcode;
     state.uid = this.state.uid;
     state.id = this.state.id;
+    state.show_modal = this.state.show_modal;
     localStorage.setItem('state', JSON.stringify(state))
     console.log('State Saved!')
     console.log(state)
@@ -457,7 +462,6 @@ class App extends React.Component {
     console.log('State Loaded!')
     console.log(state)
   }
-
   render() {
     let root_artists = this.state.root_artists.map((artist, id) =>
       <button key={id}
@@ -468,24 +472,35 @@ class App extends React.Component {
       </button>
     )
 
+    let branches_user = this.state.branches_user.map((branch, id) =>
+      <div key={id}>
+        {id}
+      </div>)
+
+
     let limbs = this.state.limbs.map((limb, id) =>
-      <div key={id} className="limb d-flex">
-        <div className="col-1">{id+1}</div>
-        <div className="col-3 text-left">{limb.artist.name}</div>
-        <div className="col-4 text-left">{limb.song.name}</div>
-        <div className="col-2">{limb.event.location.city}</div>
-        <div className="col-2">{limb.event.start.date}</div>
+      <div key={id} className="limb d-flex align-text-center">
+        <div>{id + 1}</div>
+        <div className="col-3 text-left"><a target="_blank" rel="noopener noreferrer" href={limb.artist.external_urls.spotify}>{limb.artist.name}</a></div>
+        <div className="col-3 text-left"><a target="_blank" rel="noopener noreferrer" href={limb.song.external_urls.spotify}>{limb.song.name}</a></div>
+        <div className="col-2"><a target="_blank" rel="noopener noreferrer" href={limb.event.venue.uri}>{limb.event.venue.displayName}</a></div>
+        <div className="col-1"><a target="_blank" rel="noopener noreferrer" href={limb.event.uri}>get tix</a></div>
+        <div className="col-2">{limb.event.location.city.replace(", US", "")}</div>
+        <div>{limb.event.start.date.slice(5, limb.event.start.date.length)}</div>
+        <button className="btn-delete position-absolute">x</button>
       </div>
     )
 
-    let limbs_table = 
+    let limbs_table =
       <div className="limbs">
         <div className="limb font-weight-bolder">
-          <div className="col-1">#</div>
+          <div>#</div>
           <div className="col-3 text-left">Artist</div>
-          <div className="col-4 text-left">Top Song</div>
+          <div className="col-3 text-left">Top Song</div>
+          <div className="col-2">Venue</div>
+          <div className="col-1">Tickets</div>
           <div className="col-2">City</div>
-          <div className="col-2">Date</div>
+          <div>Date</div>
         </div>
         {limbs}
       </div>
@@ -505,16 +520,18 @@ class App extends React.Component {
             <div>
               <div className="top-bar fixed-top d-flex align-items-center justify-content-between p-2">
                 <h4 className="">Hey, {this.state.username}</h4>
-                
+
                 <div>
-                  <a href="/my-branches/" className="btn m-2">My Branches ({this.state.branches.length})</a>
+                  <button type="button" className="btn btn-primary" onClick={() => this.setState({ show_modal: true })}>
+                    My Branches ({this.state.branches_user.length})
+                  </button>
                   <a href="/logout/" className='btn-logout btn m-2'>Logout</a>
                 </div>
-                
+
               </div>
             </div>
           )}
-          
+
           <br />
           <br />
           <br />
@@ -630,8 +647,22 @@ class App extends React.Component {
           <br />
           {this.state.limbs.length > 0 && (
             <div>
-              <img alt="upload customized cover for this branch"/>
-            {limbs_table}
+              <header>
+                <h2>Here's your new branch, let's give it a name:</h2>
+                <form onSubmit={this.handleSubmit}>
+                  <input onChange={this.handleImageChange} type="file" id="upload-photo" name="image" accept="image/*" />
+                  <label id="upload-photo-label" for="upload-photo">Browse</label>
+                  <button type="submit" value="Upload!">Upload</button>
+                </form>
+
+                <input type='file' name='image' />
+                {this.state.image ? (
+                  <img src={this.state.preview} alt='preview' width="200" />
+                ) : (
+                    null
+                  )}
+              </header>
+              {limbs_table}
             </div>)}
         </header>
       </div>

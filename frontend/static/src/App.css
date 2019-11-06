@@ -63,7 +63,7 @@ body {
   border: 0.2em solid #1ecd97;
   color: #1ecd97;
   cursor: pointer;
-  font-size: 3vmin;
+  font-size: 2.5vmin;
   padding: 0.7em 1.5em;
   text-transform: uppercase;
   transition: all 0.25s ease;
@@ -85,7 +85,7 @@ body {
   border-radius: 2em;
   border: 0.2em solid rgb(139, 139, 139);
   color: rgb(139, 139, 139);
-  font-size: 3vmin;
+  font-size: 2.5vmin;
   padding: 0.7em 1.5em;
   text-transform: uppercase;
   transition: all 0.25s ease;
@@ -101,6 +101,14 @@ body {
 
 .btn-logout {
   background-color: #282c34;
+}
+
+.btn-delete {
+  left: -15px;
+  color: #aaa;
+  background: transparent;
+  border: none;
+
 }
 
 .refresh-btn {
@@ -157,8 +165,8 @@ body {
   border-top: 1px solid #aaa;
   height: 42px;
   display: flex;
-  flex-flow: row wrap;
   align-items: center;
+  position: relative;
 }
   
 .limb:hover {
@@ -176,3 +184,4 @@ body {
   width: 90vw;
   font-size: calc(6px + 2vmin);
 }
+
