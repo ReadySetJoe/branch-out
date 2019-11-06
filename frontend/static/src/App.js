@@ -1,12 +1,13 @@
 import React from 'react';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSync } from '@fortawesome/free-solid-svg-icons';
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
+import { faSync} from '@fortawesome/free-solid-svg-icons';
+import { faPagelines } from '@fortawesome/free-brands-svg-icons';
+
 
 import SpotifyWebApi from 'spotify-web-api-js';
 import Player from "./Player";
+import Modal from "./Modal";
 import './App.css';
 
 axios.defaults.xsrfCookieName = 'csrftoken';
@@ -18,7 +19,7 @@ const SK_AUTH_KEY = 'io09K9l3ebJxmxe2'
 
 // Debug Variables
 const API_LIMITER = false; // API Limiter (debug boolean ensuring limited API calling) 
-const SAVE_TO_LOCAL_STORAGE = true;
+const SAVE_TO_LOCAL_STORAGE = false;
 
 class App extends React.Component {
   constructor(props) {
@@ -70,12 +71,16 @@ class App extends React.Component {
 
       // Branch
       branch: [],
+      preview: "",
+      image: null,
 
       // Database
       limbs_user: [],
       branches_user: [],
       show_modal: false,
     };
+    this.myRef = React.createRef();
+
     this.getNowPlaying = this.getNowPlaying.bind(this);
     this.useTopArtists = this.useTopArtists.bind(this);
     this.useNowPlaying = this.useNowPlaying.bind(this);
@@ -83,6 +88,7 @@ class App extends React.Component {
     this.useMyLocation = this.useMyLocation.bind(this);
     this.findEvents = this.findEvents.bind(this);
     this.addNowPlayingToList = this.addNowPlayingToList.bind(this);
+    this.handleImageChange = this.handleImageChange.bind(this);
     this.makeLimbs = this.makeLimbs.bind(this);
     this.makeBranch = this.makeBranch.bind(this);
     this.save = this.save.bind(this);
@@ -424,6 +430,18 @@ class App extends React.Component {
       .catch(err => console.log(err))
   }
 
+  handleImageChange(e) {
+    let file = e.target.files[0];
+    // console.log(file)
+    this.setState({image: file});
+    
+    let reader = new FileReader();
+    reader.onloadend = () => {
+      this.setState({preview: reader.result})
+    };
+
+    reader.readAsDataURL(file);
+  }
   save() {
     let state = {}
     state.token = this.state.token;
@@ -462,6 +480,7 @@ class App extends React.Component {
     console.log('State Loaded!')
     console.log(state)
   }
+
   render() {
     let root_artists = this.state.root_artists.map((artist, id) =>
       <button key={id}
@@ -471,12 +490,6 @@ class App extends React.Component {
         {artist.name}
       </button>
     )
-
-    let branches_user = this.state.branches_user.map((branch, id) =>
-      <div key={id}>
-        {id}
-      </div>)
-
 
     let limbs = this.state.limbs.map((limb, id) =>
       <div key={id} className="limb d-flex align-text-center">
@@ -505,6 +518,8 @@ class App extends React.Component {
         {limbs}
       </div>
 
+      console.log(this.state.image)
+
     return (
       <div className="App">
         <header className="App-header">
@@ -514,6 +529,12 @@ class App extends React.Component {
               <button className='btn' onClick={() => this.load()}>load</button>
             </div>
           )}
+          <Modal 
+            show={this.state.show_modal}
+            branches={this.state.branches_user}
+            limbs={this.state.limbs_user}
+            handleClose={() => this.setState({show_modal: false})}
+          />
           <h1 className="title">branch.out</h1>
           <nav className="scrollspy-placeholder fixed-left"><ul></ul></nav>
           {this.state.token && (
@@ -558,7 +579,7 @@ class App extends React.Component {
                   />
                 ) : (
                     <div>
-                      <div>Let's get started.</div>
+                      <h3>Let's get started.</h3>
                       <div>To make sure your Spotify is connected, play a song (on your phone, or any device) and hit the resync button to make sure you're connected</div>
                     </div>
                   )}
@@ -617,7 +638,8 @@ class App extends React.Component {
               <div>Please enter your zip code: <input type='text'></input></div>
             </div>
 
-            <div>{this.state.latitude}, {this.state.longitude}</div>
+            <div>{this.state.latitude}, </div><br/> 
+            <div>{this.state.longitude}</div>
 
           </div>
 
@@ -648,19 +670,26 @@ class App extends React.Component {
           {this.state.limbs.length > 0 && (
             <div>
               <header>
-                <h2>Here's your new branch, let's give it a name:</h2>
-                <form onSubmit={this.handleSubmit}>
-                  <input onChange={this.handleImageChange} type="file" id="upload-photo" name="image" accept="image/*" />
-                  <label id="upload-photo-label" for="upload-photo">Browse</label>
-                  <button type="submit" value="Upload!">Upload</button>
+                <form  onSubmit={() => this.makeBranch()} className="new-branch-form d-flex flex-row align-items-center justify-content-around">
+                  <button type='button' icon="file" onClick={() => this.myRef.current.click()} className="btn branch-img-preview-btn">
+                    {this.state.image ? (
+                      <img className="branch-img-preview" src={this.state.preview} alt='branch cover preview' width="200" />
+                    ) : (
+                      <div>
+                        <FontAwesomeIcon icon={faPagelines} className="fa-7x"/>
+                        <br/>
+                        <p>cover image upload</p>
+                      </div>
+                    )}
+                  </button>
+                  <input className="d-none" ref={this.myRef} type='file' name='image' onChange={this.handleImageChange}/>             
+                  <div className="text-left">
+                    <label>Here's your new branch, let's give it a name:</label>
+                    <br/>
+                    <input type="text"/>
+                  </div>
+                  <button className="btn" type="submit" value="save">Add to My Branches</button>
                 </form>
-
-                <input type='file' name='image' />
-                {this.state.image ? (
-                  <img src={this.state.preview} alt='preview' width="200" />
-                ) : (
-                    null
-                  )}
               </header>
               {limbs_table}
             </div>)}

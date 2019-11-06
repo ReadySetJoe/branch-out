@@ -43,7 +43,7 @@ body {
 .title {
   color: #eee;
   opacity: 1;
-  z-index: 9999;
+  z-index: 1039;
   margin: 8px;
   position: fixed;
   top: 0;
@@ -73,6 +73,11 @@ body {
 .btn:hover {
   background: #1ecd97;
   color: #333;
+}
+
+.btn-nohover:hover {
+  background: transparent;
+  color: white;
 }
 
 .btn-selected {
@@ -160,6 +165,25 @@ body {
   flex: 1;
 }
 
+/** Branch **/
+.branch-img-preview-btn {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  border: 1px solid #aaa;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.branch-img-preview {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  position: absolute;
+}
+
 /** Limbs **/
 .limb {
   border-top: 1px solid #aaa;
@@ -182,6 +206,9 @@ body {
   flex-flow: column wrap;
   margin-bottom: 15px;
   width: 90vw;
-  font-size: calc(6px + 2vmin);
+  font-size: calc(6px + 1.5vmin);
 }
 
+.limb > div > a {
+  color: white;
+}
