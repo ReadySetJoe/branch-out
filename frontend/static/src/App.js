@@ -2,8 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSync} from '@fortawesome/free-solid-svg-icons';
-import { faPagelines } from '@fortawesome/free-brands-svg-icons';
-
+import { faPagelines, faGithub, faLinkedin, faFontAwesome, faSpotify } from '@fortawesome/free-brands-svg-icons';
 
 import SpotifyWebApi from 'spotify-web-api-js';
 import Player from "./Player";
@@ -21,7 +20,7 @@ const SK_AUTH_KEY = 'io09K9l3ebJxmxe2'
 
 // Debug Variables
 const API_LIMITER = false; // API Limiter (debug boolean ensuring limited API calling) 
-const SAVE_TO_LOCAL_STORAGE = true;
+const SAVE_TO_LOCAL_STORAGE = false;
 
 class App extends React.Component {
   constructor(props) {
@@ -590,12 +589,14 @@ class App extends React.Component {
               <button className='btn' onClick={() => this.load()}>load</button>
             </div>
           )}
+
           <Modal 
             show={this.state.show_modal}
             branches={this.state.branches_user}
             limbs={this.state.limbs_user}
             handleClose={() => this.setState({show_modal: false})}
           />
+          
           <h1 className={`${this.state.token ? ('title') : ('title title-login')}`}>branch.out</h1>
           <nav className="scrollspy-placeholder fixed-left"><ul></ul></nav>
           {this.state.token && (
@@ -614,16 +615,32 @@ class App extends React.Component {
             </div>
           )}
 
+          <footer className="bottom-bar fixed-bottom d-flex align-items-center justify-content-between p-2">
+            <div className="ccs-thank-you">Created for <a href="https://carolinacodeschool.org/">Carolina Code School</a>, Nov 2019</div>
+            <div className="created-by">branch.out was made by Joe Powers, more of his stuff here:
+              <a className="m-1" href="https://github.com/ReadySetJoe"><FontAwesomeIcon icon={faGithub} /></a>
+              <a className="m-1" href="https://www.linkedin.com/in/joe-powers/"><FontAwesomeIcon icon={faLinkedin} /></a>              
+            </div>
+            <div className="citations">
+              API's:
+              <div className="citation-spotify"><a href="https://developer.spotify.com/">Spotify API<FontAwesomeIcon icon={faSpotify}/></a></div>
+              {/* <div className="citation-songkick"><a href="https://www.songkick.com/developer">Songkick API</a><img src="./"/></div> */}
+              Style:
+              <div className="citation-fontawesome"></div>
+              <div className="citation-style"></div>
+            </div>
+
+          </footer>
+
           {!this.state.token && (
             <div className="mt-5">
               <a className="btn btn--loginApp-link" href="/social/login/spotify/">Login to Spotify</a>
             </div>
           )}
+
           {this.state.token && (
             <div className="w-100 mt-5">
               <div className='player-wrapper'>
-                
-
                 {this.state.item.album.images[0].url ? (
                   <Player
                     item={this.state.item}
@@ -633,11 +650,10 @@ class App extends React.Component {
                 ) : (
                     <div>
                       <h3>Let's get started.</h3>
-                      <div>To make sure your Spotify is connected, play a song (on your phone, or any device) and hit the resync button to make sure you're connected</div>
+                      <div>To make sure your Spotify is connected, play a song (on your phone, or any device)</div>
                     </div>
                   )}
                 {SPOTIFY_INTERVAL_LIMITER && (<button className='btn p-1 refresh-btn' onClick={() => this.getNowPlaying()}><span className="p-1"><FontAwesomeIcon icon={faSync} /></span></button>)}
-
               </div>
               <button className={`btn ${this.state.use_now_playing ? 'btn-selected' : ''} `} onClick={() => this.useNowPlaying()}>Use Artists Related to Now Playing</button>
               <button className={`btn ${this.state.use_top_artists ? 'btn-selected' : ''} `} onClick={() => this.useTopArtists()}>Use Your Top Artists</button>

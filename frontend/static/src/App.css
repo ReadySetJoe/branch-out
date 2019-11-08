@@ -78,6 +78,18 @@ body {
   font-size: 12px;
 }
 
+/** Footer **/
+.bottom-bar {
+  background-color: #282c34;
+  opacity: 0.6;
+  border-top: 1px solid #aaa; 
+  font-size: small; 
+}
+
+.ccs-thank-you > a, .created-by > a {
+  color: white;
+}
+
 /** Player **/
 .player-wrapper {
   margin: 25px;
