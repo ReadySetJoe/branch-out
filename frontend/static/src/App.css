@@ -58,7 +58,7 @@ body {
 }
 
 .title-login::after {
-  content: "Welcome, this is branch.out\AI help people find new music that's coming to a nearby stage soon.\ALet's find the the next concert you'll never forget";
+  content: "Welcome, this is branch.out\A A site that helps people find new music, coming to a nearby stage soon.\ALet's find the the next concert you'll never forget";
   font-size: large;
   white-space: pre-wrap;
   margin-top: 10px;
