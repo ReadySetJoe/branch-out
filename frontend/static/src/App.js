@@ -16,13 +16,13 @@ axios.defaults.xsrfHeaderName = 'X-CSRFToken';
 
 const spotifyApi = new SpotifyWebApi();
 const SPOTIFY_API_INTERVAL_SECS = 1;
-const SPOTIFY_INTERVAL_LIMITER = false;
+const SPOTIFY_INTERVAL_LIMITER = true;
 
 const SK_AUTH_KEY = 'io09K9l3ebJxmxe2'
 
 // Debug Variables
 const API_LIMITER = false; // API Limiter (debug boolean ensuring limited API calling) 
-const SAVE_TO_LOCAL_STORAGE = false;
+const SAVE_TO_LOCAL_STORAGE = true;
 
 class App extends React.Component {
   constructor(props) {
@@ -54,6 +54,7 @@ class App extends React.Component {
       root_artists_selection_complete: false,
 
       // Location
+      navigator_has_geolocation: false,
       latitude: 0,
       longitude: 0,
       zipcode: 0,
@@ -119,6 +120,9 @@ class App extends React.Component {
       let intervalID = setInterval(() => this.getNowPlaying(), SPOTIFY_API_INTERVAL_SECS * 1000);
       this.setState({intervalID: intervalID})  
     }
+
+    // Check for Geolocation in Navigator
+    this.setState({navigator_has_geolocation: "geolocation" in navigator})
 
     // Reloads user, based on token stored in state
     if (!this.state.token) {
@@ -585,7 +589,7 @@ class App extends React.Component {
       <div className="App">
         <header className="App-header">
           {SAVE_TO_LOCAL_STORAGE && (
-            <div style={{ position: "fixed", bottom: 5, right: 5, }}>
+            <div style={{ position: "fixed", bottom: 60, right: 5, }}>
               <button className='btn' onClick={() => this.save()}>save</button>
               <button className='btn' onClick={() => this.load()}>load</button>
             </div>
@@ -638,14 +642,14 @@ class App extends React.Component {
           </footer>
 
           {!this.state.token && (
-            <div className="mt-5">
+            <div className="my-5">
               <a className="btn btn--loginApp-link" href="/social/login/spotify/">Login to Spotify</a>
             </div>
           )}
 
           {this.state.token && (
-            <div className="w-100 mt-5">
-              <div className='player-wrapper justify-content-center'>
+            <div className="w-100">
+              <section className='player-wrapper justify-content-center'>
                 {this.state.item.album.images[0].url ? (
                   <Player
                     item={this.state.item}
@@ -659,65 +663,59 @@ class App extends React.Component {
                     </div>
                   )}
                 {SPOTIFY_INTERVAL_LIMITER && (<button className='btn p-1 refresh-btn' onClick={() => this.getNowPlaying()}><span className="p-1"><FontAwesomeIcon icon={faSync} /></span></button>)}
-              </div>
+              </section>
+
+              <div className="separator"></div>
+              
               <button className={`btn ${this.state.use_now_playing ? 'btn-selected' : ''} `} onClick={() => this.useNowPlaying()}>Use Artists Related to Now Playing</button>
               <button className={`btn ${this.state.use_top_artists ? 'btn-selected' : ''} `} onClick={() => this.useTopArtists()}>Use Your Top Artists</button>
             </div>
           )}
 
 
-          <br />
-          <br />
-          <br />
-
-          <div className={`${this.state.use_now_playing || this.state.use_top_artists ? 'd-flex align-items-center' : 'd-none'} `}>
-            <div>
-              <button className='btn' onClick={() => this.setState({ root_artists_selected: this.state.root_artists })}>All</button>
-              <button className='btn' onClick={() => this.setState({ root_artists_selected: [] })}>None</button>
-            </div>
-
-            <div>{root_artists}</div>
-
-          </div>
-
-          <br />
-          <br />
-          <br />
-
-          <div className={`${this.state.use_now_playing || this.state.use_top_artists ? 'd-flex align-items-center' : 'd-none'} `}>
-            <h2 className="m-2">Select at least 3 starting bands to continue</h2>
-            <button
-              onClick={() => {
-                if (this.state.root_artists_selected.length >= 3) {
-                  this.setState({ root_artists_selection_complete: true });
-                  this.findArtists();
-                }
-              }}
-              className={`${this.state.root_artists_selected.length >= 3 ? 'btn' : 'btn-disabled'} ${this.state.root_artists_selection_complete ? 'btn-selected' : ''}`}
-            >Continue Using These Bands</button>
-          </div>
-
-          <br />
-          <br />
-          <br />
-
-          <div className={`location ${this.state.root_artists_selection_complete ? 'd-flex' : 'd-none'}`}>
-            <div className="d-flex flex-column justify-content-left">
-              <div className={` ${"geolocation" in navigator ? 'd-flex flex-column' : 'd-none'}`}>
-                <button className="btn" onClick={this.useMyLocation}>Find My Location</button>
-                <p>~or~</p>
+          <section className={`${this.state.use_now_playing || this.state.use_top_artists ? 'animate fadeInRight d-flex flex-column align-items-center' : 'd-none'} `}>
+            <h2 className="animate fade-in-right my-4 align-self-baseline ">Please select at least 3 root artists to continue:</h2>
+            <div className="d-flex align-items-center">
+              <div>
+                <button className='btn' onClick={() => this.setState({ root_artists_selected: this.state.root_artists })}>All</button>
+                <button className='btn' onClick={() => this.setState({ root_artists_selected: [] })}>None</button>
               </div>
-              <div>Please enter your zip code: <input type='text'></input></div>
+
+              <div>{root_artists}</div>
             </div>
+            <div>
+              <button
+                onClick={() => {
+                  if (this.state.root_artists_selected.length >= 3) {
+                    this.setState({ root_artists_selection_complete: true });
+                    this.findArtists();
+                  }
+                }}
+                className={`mt-5 
+                ${this.state.root_artists_selected.length >= 3 ? 'btn' : 'btn-disabled'} 
+                ${this.state.root_artists_selection_complete ? 'btn-selected' : ''}
+                `}
+              >Continue Using These Artists</button>
+            </div>
+          </section>
 
-            <div>{this.state.latitude}, </div><br/> 
-            <div>{this.state.longitude}</div>
 
-          </div>
+          {/* <div className="separator"></div> */}
 
-          <br />
-          <br />
-          <br />
+          {/* {this.state.root_artists_selection_complete && (<section className={`location ${this.state.root_artists_selection_complete ? 'd-flex animate fadeInLeft' : 'd-none'}`}> */}
+          {this.state.root_artists_selection_complete && (
+            <section className='location d-flex justify-content-center animate fadeInLeft'>
+              <div className={` ${this.state.navigator_has_geolocation ? 'd-flex flex-column' : 'd-none'}`}>
+                <div>Latitude: {this.state.latitude}</div>
+                <div>Longitude: {this.state.longitude}</div>
+                <button className="btn" onClick={this.useMyLocation}>Find My Location</button>
+                {/* <p>~or~</p> */}
+              </div>
+              {/* <div>Please enter your zip code: <input type='text'></input></div> */}
+            </section>
+          )}
+
+          {/* <div className="separator"></div> */}
 
           <div className={` ${this.state.root_artists_selection_complete && this.state.latitude !== 0 ? 'd-flex flex-column' : 'd-none'}`}>
             Let's do the thing
@@ -738,9 +736,11 @@ class App extends React.Component {
             <button className="btn" onClick={() => this.makeBranch()}>Make Branch</button>
             <br />
           </div>
-          <br />
+          
+          {/* <div className="separator"></div> */}
+
           {this.state.limbs.length > 0 && (
-            <div>
+            <section>
               <header>
                 <form  onSubmit={this.makeBranch} className="new-branch-form d-flex flex-row align-items-center justify-content-around">
                   <button type='button' icon="file" onClick={() => this.myRef.current.click()} className="btn branch-img-preview-btn">
@@ -764,7 +764,7 @@ class App extends React.Component {
                 </form>
               </header>
               {limbs_table}
-            </div>)}
+            </section>)}
         </header>
       </div>
     );

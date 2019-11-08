@@ -188,6 +188,9 @@ SOCIAL_AUTH_SPOTIFY_SECRET = os.environ['SPOTIFY_AUTH_SECRET']
 SOCIAL_AUTH_POSTGRES_JSONFIELD = True
 SOCIAL_AUTH_SPOTIFY_SCOPE = ["user-read-currently-playing", "user-read-playback-state", "user-read-private", "user-read-email", "user-top-read", 'playlist-modify-public',]
 
+GOOGLE_API_KEY = os.environ['GOOGLE_API_KEY']
+GOOGLE_API_KEY_DEV = os.environ['GOOGLE_API_KEY_DEV']
+
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',
     'django.core.context_processors.debug',
