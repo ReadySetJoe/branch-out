@@ -14,6 +14,8 @@ axios.defaults.xsrfCookieName = 'csrftoken';
 axios.defaults.xsrfHeaderName = 'X-CSRFToken';
 
 const spotifyApi = new SpotifyWebApi();
+const SPOTIFY_API_INTERVAL_SECS = 1;
+const SPOTIFY_INTERVAL_LIMITER = true;
 
 const SK_AUTH_KEY = 'io09K9l3ebJxmxe2'
 
@@ -41,6 +43,7 @@ class App extends React.Component {
       },
       is_playing: "Paused",
       progress_ms: 0,
+      intervalID: 0,
 
       // Artist Selection
       root_artists: [],
@@ -110,6 +113,12 @@ class App extends React.Component {
 
     this.setState({branch_name: `${BRANCH_ADJ_1.toLowerCase()}-${BRANCH_ADJ_2.toLowerCase()}-${BRANCH_NOUN.toLowerCase()}`})
 
+    // Setting interval for automated getNowPlaying() calls
+    if (!SPOTIFY_INTERVAL_LIMITER) {
+      let intervalID = setInterval(this.getNowPlaying, SPOTIFY_API_INTERVAL_SECS * 1000);
+      this.setState({intervalID: intervalID})  
+    }
+
     // Reloads user, based on token stored in state
     if (!this.state.token) {
       axios.get(`/api/v1/user-social-auth/`)
@@ -136,6 +145,11 @@ class App extends React.Component {
       this.getNowPlaying()
     }
   }
+ 
+ componentWillUnmount() {
+    // use intervalID from the state to clear the interval
+    clearInterval(this.state.intervalID);
+ }
 
   getNowPlaying() {
     spotifyApi.getMyCurrentPlaybackState()
@@ -326,8 +340,8 @@ class App extends React.Component {
           artists_all = artists_all.concat(res.artists)
           this.setState({ artists_all: artists_all })
           
-          if (i === this.state.root_artists_selected-1) // last pull
-            {console.log(`# of artists found: ${this.state.artists_all.length}`)}
+          if (i === this.state.root_artists_selected-1) { // last pull
+            console.log(`# of artists found: ${this.state.artists_all.length}`)}
         })
         .catch(err => {
           console.log(err)
@@ -582,14 +596,14 @@ class App extends React.Component {
             limbs={this.state.limbs_user}
             handleClose={() => this.setState({show_modal: false})}
           />
-          <h1 className="title">branch.out</h1>
+          <h1 className={`${this.state.token ? ('title') : ('title title-login')}`}>branch.out</h1>
           <nav className="scrollspy-placeholder fixed-left"><ul></ul></nav>
           {this.state.token && (
             <div>
               <div className="top-bar fixed-top d-flex align-items-center justify-content-between p-2">
                 <h4 className="">Hey, {this.state.first_name}</h4>
 
-                <div>
+                <div className="top-right-btns">
                   <button type="button" className="btn btn-primary" onClick={() => this.setState({ show_modal: true })}>
                     My Branches ({this.state.branches_user.length})
                   </button>
@@ -600,23 +614,15 @@ class App extends React.Component {
             </div>
           )}
 
-          <br />
-          <br />
-          <br />
-
           {!this.state.token && (
-            <div>
-              <a
-                className="btn btn--loginApp-link"
-                href="/social/login/spotify/"
-              >
-                Login to Spotify
-            </a>
+            <div className="mt-5">
+              <a className="btn btn--loginApp-link" href="/social/login/spotify/">Login to Spotify</a>
             </div>
           )}
           {this.state.token && (
-            <div>
+            <div className="w-100 mt-5">
               <div className='player-wrapper'>
+                
 
                 {this.state.item.album.images[0].url ? (
                   <Player
@@ -630,12 +636,9 @@ class App extends React.Component {
                       <div>To make sure your Spotify is connected, play a song (on your phone, or any device) and hit the resync button to make sure you're connected</div>
                     </div>
                   )}
-                <button className='btn p-1 refresh-btn' onClick={() => this.getNowPlaying()}><span className="p-1"><FontAwesomeIcon icon={faSync} /></span></button>
+                {SPOTIFY_INTERVAL_LIMITER && (<button className='btn p-1 refresh-btn' onClick={() => this.getNowPlaying()}><span className="p-1"><FontAwesomeIcon icon={faSync} /></span></button>)}
 
               </div>
-              <br />
-              <br />
-              <br />
               <button className={`btn ${this.state.use_now_playing ? 'btn-selected' : ''} `} onClick={() => this.useNowPlaying()}>Use Artists Related to Now Playing</button>
               <button className={`btn ${this.state.use_top_artists ? 'btn-selected' : ''} `} onClick={() => this.useTopArtists()}>Use Your Top Artists</button>
             </div>

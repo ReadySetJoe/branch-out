@@ -49,10 +49,40 @@ body {
   top: 0;
 }
 
+.title-login {
+  font-size: 100px;
+  position: static;
+  display: flex;
+  flex-flow: column;
+  align-self: center;
+}
+
+.title-login::after {
+  content: "Welcome, this is branch.out\AI help people find new music that's coming to a nearby stage soon.\ALet's find the the next concert you'll never forget";
+  font-size: large;
+  white-space: pre-wrap;
+  margin-top: 10px;
+}
+
 .top-bar {
   background-color: #282c34;
   opacity: 0.6;
   border-bottom: 1px solid #aaa;
+}
+
+.top-right-btns {
+  max-width: 35%;
+}
+
+.top-right-btns > .btn {
+  font-size: 12px;
+}
+
+/** Player **/
+.player-wrapper {
+  margin: 25px;
+  padding: 25px;
+  border-bottom: solid 1px #aaa;
 }
 
 /** Buttons **/
@@ -63,7 +93,7 @@ body {
   border: 0.2em solid #1ecd97;
   color: #1ecd97;
   cursor: pointer;
-  font-size: 2.5vmin;
+  font-size: calc(8px + 1.5vmin);
   padding: 0.7em 1.5em;
   text-transform: uppercase;
   transition: all 0.25s ease;

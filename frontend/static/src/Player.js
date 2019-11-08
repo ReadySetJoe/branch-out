@@ -10,7 +10,7 @@ const Player = props => {
   };
   
   return (
-    <div className="App">
+    <div className="App w-100">
       <div className="main-wrapper">
         <div className="now-playing__img">
           <img alt="This should be the album art for the current playback" src={props.item.album.images[0].url} />
