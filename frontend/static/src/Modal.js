@@ -1,30 +1,26 @@
 import React from 'react';
+import './Modal.css'
 
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 
 class UserModal extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-
-    }
-  }
 
   render() {
     let branches = this.props.branches.map((branch, id) =>
     <div key={id}>
       {id}
     </div>)
+
+    console.log(this.props.branches)
     return (
       <>
-        <Modal show={this.props.show} onHide={this.props.handleClose}>
+        <Modal className="main" show={this.props.show} onHide={this.props.handleClose}>
           <Modal.Header closeButton>
             <Modal.Title>Modal heading</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            Woohoo, you're reading this text in a modal!
-            <div>
+            <div className="d-flex">
               {branches}
             </div>
           </Modal.Body>

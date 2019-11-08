@@ -19,14 +19,14 @@ const SK_AUTH_KEY = 'io09K9l3ebJxmxe2'
 
 // Debug Variables
 const API_LIMITER = false; // API Limiter (debug boolean ensuring limited API calling) 
-const SAVE_TO_LOCAL_STORAGE = false;
+const SAVE_TO_LOCAL_STORAGE = true;
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       token: null,
-      username: '',
+      first_name: '',
       uid: '',
       id: '',
 
@@ -70,6 +70,7 @@ class App extends React.Component {
       limbs: [],
 
       // Branch
+      branch_name: '',
       branch: [],
       preview: "",
       image: null,
@@ -93,9 +94,22 @@ class App extends React.Component {
     this.makeBranch = this.makeBranch.bind(this);
     this.save = this.save.bind(this);
     this.load = this.load.bind(this);
+    this.handleLimbDelete = this.handleLimbDelete.bind(this);
+    this.handleBranchDelete = this.handleBranchDelete.bind(this);
+    
   }
 
   componentDidMount() {
+    // Generates random branch name
+    const NAME_ADJ = [	'accessible',	'accomplished',	'ambitious',	'assured',	'bangin',	'beautiful',	'blissful',	'bold',	'breathtaking',	'brilliant',	'catchy',	'cerebral',	'classic',	'clean',	'clever',	'cleverly-written',	'cohesive',	'complex',	'conceptual',	'danceable',	'definitive',	'deftly-produced',	'delightful',	'dynamic',	'ebullient',	'eclectic',	'ecstatic',	'effortless',	'emotionally-rich',	'endlessly-playable',	'enigmatic',	'enterntaining',	'epic',	'ethereal',	'exceptional',	'exhilarating',	'expansive',	'notable',	'nuanced',	'number',	'operatic',	'passionate',	'percussion-saoked',	'perfect',	'piercing',	'playful',	'poetic',	'poignant',	'polished',	'primal',	'progressive',	'radical',	'raw',	'refined',	'refrain',	'relentless',	'reliably-solid',	'reverbed',	'rhythimic',	'riotous',	'riveting',	'rollicking',	'satisfying',	'saturated',	'sculptural',	'seductive',	'sensitive',	'skilled',	'skillful',	'soaring',	'solid',	'sombre',	'sonic',	'sophisticated',	'feel-good',	'finely-calibrated',	'flawless',	'fluid',	'focused',	'fresh',	'funky',	'grandiose',	'groundbreaking',	'harmonic',	'harmonically-rich',	'headbanging',	'heartfelt',	'hi-fi',	'highly-listenable',	'highly-recommended',	'hypnotic',	'indulgent',	'innocent',	'instrospective',	'instrumental',	'intoxicating',	'inventice',	'invigorating',	'inviting',	'latest',	'layered',	'limitless',	'listenable',	'lush',	'lyrical',	'masterful',	'mesmerizing',	'midtempo',	'moody',	'musical',	'mythical',	'sprawling',	'staccato',	'stratospheric',	'strident',	'striking',	'studied',	'stunning',	'stylish',	'stylistic',	'sublime',	'successful',	'surprising',	'symphonic',	'synthetic',	'talented',	'tender',	'textured',	'thrilling',	'throbbing',	'thunderous',	'tight',	'timeless',	'top-flight',	'trademark',	'trailblazing',	'transcendent',	'transporting',	'unexpected',	'unfied',	'unique',	'unpredictable',	'unsung',	'upbeat',	'visionary',	'vocal',	'well-rounded',	'well-tooled',]
+    const NAME_NOUN = [	'Alder',	'Apple',	'Ash',	'Aspen',	'Basswood',	'Birch',	'Buckeye',	'Buckthorn',	'California-laurel',	'Catalpa',	'Cedar',	'Cherry',	'Chestnut',	'Chinkapin',	'Cottonwood',	'Cypress',	'Dogwood',	'Douglas-fir',	'Elm',	'Filbert',	'Fir',	'Giant',	'Hawthorn',	'Hazel',	'Hemlock',	'Holly',	'Honeylocust',	'Horsechestnut',	'Incense-cedar',	'Juniper',	'Larch',	'Locust',	'Madrone',	'Maple',	'Mountain-ash',	'Mountain-mahogany',	'Oak',	'Oregon-myrtle',	'Pear',	'Pine',	'Plum',	'Poplar',	'Redcedar/Arborvitae',	'Redwood',	'Russian-olive',	'Spruce',	'Sweetgum',	'Sycamore',	'Tanoak',	'Walnut',	'White-cedar',	'Willow',	'Yellow-poplar',	'Yew',]
+    
+    const BRANCH_ADJ_1 = NAME_ADJ[Math.floor(Math.random() * NAME_ADJ.length)];
+    const BRANCH_ADJ_2 = NAME_ADJ[Math.floor(Math.random() * NAME_ADJ.length)];
+    const BRANCH_NOUN = NAME_NOUN[Math.floor(Math.random() * NAME_NOUN.length)];
+
+    this.setState({branch_name: `${BRANCH_ADJ_1.toLowerCase()}-${BRANCH_ADJ_2.toLowerCase()}-${BRANCH_NOUN.toLowerCase()}`})
+
     // Reloads user, based on token stored in state
     if (!this.state.token) {
       axios.get(`/api/v1/user-social-auth/`)
@@ -105,24 +119,19 @@ class App extends React.Component {
           this.getNowPlaying()
           this.setState({
             token: res.data[0].extra_data.access_token,
-            username: res.data[0].user.first_name,
+            first_name: res.data[0].user.first_name,
             uid: res.data[0].uid,
             id: res.data[0].id,
           });
           axios.get(`/api/v1/branches/`)
-            .then(res => {
-              console.log(res)
-              this.setState({ branches_user: res.data })
-            })
+            .then(res => {console.log(res); this.setState({ branches_user: res.data });})
             .catch(err => console.log(err))
 
           axios.get(`/api/v1/limbs/`)
-            .then(res => { console.log(res) })
+            .then(res => { console.log(res); this.setState({ limbs_user: res.data });})
             .catch(err => { console.log(err) })
         })
-        .catch(err => {
-          console.log(err)
-        })
+        .catch(err => {console.log(err)})
     } else {
       this.getNowPlaying()
     }
@@ -316,7 +325,9 @@ class App extends React.Component {
           let artists_all = [...this.state.artists_all]
           artists_all = artists_all.concat(res.artists)
           this.setState({ artists_all: artists_all })
-          console.log(res)
+          
+          if (i === this.state.root_artists_selected-1) // last pull
+            {console.log(`# of artists found: ${this.state.artists_all.length}`)}
         })
         .catch(err => {
           console.log(err)
@@ -391,9 +402,14 @@ class App extends React.Component {
     }
   }
 
-  makeBranch() {
+  makeBranch(e) {
+    e.preventDefault()
+    let branches_user = [...this.state.branches_user]
+    branches_user.push(this.state.branch)
+    this.setState({branches_user: branches_user})
+
     let branch_data = new FormData();
-    // branch_data.append('cover', this.state.image) // NEED HELP ON THIS
+    if (this.state.image) {branch_data.append('cover', this.state.image)}
     let limbs = []
     for (let i = 0; i < this.state.limbs.length; i++) {
       let limb = {
@@ -430,6 +446,36 @@ class App extends React.Component {
       .catch(err => console.log(err))
   }
 
+  handleBranchDelete(branch) {
+    axios.delete(`/api/v1/branch/${branch.id}/`)
+    .then(res => {
+      let branches_user = [...this.state.branches_user]
+      let ndx = branches_user.indexOf(branch)
+      branches_user.splice(ndx,1) 
+      this.setState({branches_user})
+    })
+    .catch(error => {
+      console.log(error)
+    })
+  }
+
+  handleLimbDelete(limb) {
+    axios.delete(`/api/v1/limb/${limb.id}/`)
+    .then(res => {console.log(res)})
+    .catch(error => {console.log(error)})
+    .finally(() => {
+      let limbs = [...this.state.limbs]
+      let ndx = limbs.indexOf(limb)
+      limbs.splice(ndx,1) 
+      this.setState({limbs})}
+    )
+
+  }
+
+  handleChange(e) {
+    this.setState({[e.target.name]: e.target.value});
+  }
+
   handleImageChange(e) {
     let file = e.target.files[0];
     // console.log(file)
@@ -442,6 +488,7 @@ class App extends React.Component {
 
     reader.readAsDataURL(file);
   }
+
   save() {
     let state = {}
     state.token = this.state.token;
@@ -464,7 +511,7 @@ class App extends React.Component {
     state.use_now_playing = this.state.use_now_playing;
     state.use_top_artists = this.state.use_top_artists;
     state.use_zipcode = this.state.use_zipcode;
-    state.username = this.state.username;
+    state.first_name = this.state.first_name;
     state.zipcode = this.state.zipcode;
     state.uid = this.state.uid;
     state.id = this.state.id;
@@ -500,7 +547,7 @@ class App extends React.Component {
         <div className="col-1"><a target="_blank" rel="noopener noreferrer" href={limb.event.uri}>get tix</a></div>
         <div className="col-2">{limb.event.location.city.replace(", US", "")}</div>
         <div>{limb.event.start.date.slice(5, limb.event.start.date.length)}</div>
-        <button className="btn-delete position-absolute">x</button>
+        <button className="btn-delete" onClick={() => this.handleLimbDelete(limb)}>x</button>
       </div>
     )
 
@@ -540,13 +587,13 @@ class App extends React.Component {
           {this.state.token && (
             <div>
               <div className="top-bar fixed-top d-flex align-items-center justify-content-between p-2">
-                <h4 className="">Hey, {this.state.username}</h4>
+                <h4 className="">Hey, {this.state.first_name}</h4>
 
                 <div>
                   <button type="button" className="btn btn-primary" onClick={() => this.setState({ show_modal: true })}>
                     My Branches ({this.state.branches_user.length})
                   </button>
-                  <a href="/logout/" className='btn-logout btn m-2'>Logout</a>
+                  <a href="/accounts/logout/" className='btn-logout btn m-2'>Logout</a>
                 </div>
 
               </div>
@@ -618,7 +665,8 @@ class App extends React.Component {
             <button
               onClick={() => {
                 if (this.state.root_artists_selected.length >= 3) {
-                  this.setState({ root_artists_selection_complete: true })
+                  this.setState({ root_artists_selection_complete: true });
+                  this.findArtists();
                 }
               }}
               className={`${this.state.root_artists_selected.length >= 3 ? 'btn' : 'btn-disabled'} ${this.state.root_artists_selection_complete ? 'btn-selected' : ''}`}
@@ -655,7 +703,7 @@ class App extends React.Component {
             # of artist from those events: {this.state.events_artists.length}
             <br />
             <button className="btn" onClick={() => this.findArtists()}>Find Artists</button>
-            # of artists found: {this.state.artists_all.length}
+            
             <br />
             <button className="btn" onClick={() => this.findMatches()}>Find Matches</button>
             # of matches found: {this.state.matches.length}
@@ -670,7 +718,7 @@ class App extends React.Component {
           {this.state.limbs.length > 0 && (
             <div>
               <header>
-                <form  onSubmit={() => this.makeBranch()} className="new-branch-form d-flex flex-row align-items-center justify-content-around">
+                <form  onSubmit={this.makeBranch} className="new-branch-form d-flex flex-row align-items-center justify-content-around">
                   <button type='button' icon="file" onClick={() => this.myRef.current.click()} className="btn branch-img-preview-btn">
                     {this.state.image ? (
                       <img className="branch-img-preview" src={this.state.preview} alt='branch cover preview' width="200" />
@@ -686,7 +734,7 @@ class App extends React.Component {
                   <div className="text-left">
                     <label>Here's your new branch, let's give it a name:</label>
                     <br/>
-                    <input type="text"/>
+                    <input className="branch-name-input" name="branch_name" value={this.state.branch_name} onChange={this.handleChange} type="text"/>
                   </div>
                   <button className="btn" type="submit" value="save">Add to My Branches</button>
                 </form>

@@ -22,20 +22,14 @@ class BranchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Branch
         depth = 1
-        # fields = ['cover']
         fields = ['cover', 'limbs']
 
     def create(self, validated_data):
         # import pdb
         # pdb.set_trace()
 
-        limbs_data = validated_data.pop('limbs')
-        # limbs_data = limbs_data[0].split('{')
-        # limbs_data.pop(0)
-        # limbs_data = list(map(lambda x: '{' + x[:-1], limbs_data))
-        # # limbs_data[len(limbs_data)-1] = limbs_data[len(limbs_data)-1] + '}'
-        # limbs_data = list(map(lambda x: json.loads(x), limbs_data))
         limbs_data = json.loads(self.context['request'].data['limbs'])
+        validated_data.pop('limbs')
 
         branch = Branch.objects.create(**validated_data)
         for limb_data in limbs_data:

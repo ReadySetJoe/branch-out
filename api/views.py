@@ -77,7 +77,9 @@ class UserSocialAuthViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
     def user(self, request):
-        queryset = UserSocialAuth.objects.filter(pk=request.user.pk)
+        # import pdb
+        # pdb.set_trace()
+        queryset = UserSocialAuth.objects.filter(user=request.user)
         serializer = UserSocialAuthSerializer(queryset, many=True)
         return Response(serializer.data)
 
