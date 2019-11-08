@@ -86,8 +86,17 @@ body {
   font-size: small; 
 }
 
-.ccs-thank-you > a, .created-by > a {
+.ccs-thank-you > a, .created-by > a, .citations-api > div > a, .citations-style > div > a {
   color: white;
+}
+
+.citations > div > div {
+  white-space: nowrap;
+}
+
+.songkick-badge-img {
+  height: 13px;
+  width: 13px;
 }
 
 /** Player **/

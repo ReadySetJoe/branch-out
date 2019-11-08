@@ -3,6 +3,8 @@ import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSync} from '@fortawesome/free-solid-svg-icons';
 import { faPagelines, faGithub, faLinkedin, faFontAwesome, faSpotify } from '@fortawesome/free-brands-svg-icons';
+import skBadgePink from './images/sk-badge-pink.svg';
+import poweredBySongkickPink from './images/powered-by-songkick-pink.svg';
 
 import SpotifyWebApi from 'spotify-web-api-js';
 import Player from "./Player";
@@ -114,7 +116,7 @@ class App extends React.Component {
 
     // Setting interval for automated getNowPlaying() calls
     if (!SPOTIFY_INTERVAL_LIMITER) {
-      let intervalID = setInterval(this.getNowPlaying, SPOTIFY_API_INTERVAL_SECS * 1000);
+      let intervalID = setInterval(() => this.getNowPlaying(), SPOTIFY_API_INTERVAL_SECS * 1000);
       this.setState({intervalID: intervalID})  
     }
 
@@ -134,7 +136,6 @@ class App extends React.Component {
           axios.get(`/api/v1/branches/`)
             .then(res => {console.log(res); this.setState({ branches_user: res.data });})
             .catch(err => console.log(err))
-
           axios.get(`/api/v1/limbs/`)
             .then(res => { console.log(res); this.setState({ limbs_user: res.data });})
             .catch(err => { console.log(err) })
@@ -158,7 +159,7 @@ class App extends React.Component {
             item: data.item,
             is_playing: data.is_playing,
             progress_ms: data.progress_ms,
-            use_now_playing: false,
+            // use_now_playing: false,
           });
         }
         console.log(data)
@@ -616,18 +617,22 @@ class App extends React.Component {
           )}
 
           <footer className="bottom-bar fixed-bottom d-flex align-items-center justify-content-between p-2">
-            <div className="ccs-thank-you">Created for <a href="https://carolinacodeschool.org/">Carolina Code School</a>, Nov 2019</div>
-            <div className="created-by">branch.out was made by Joe Powers, more of his stuff here:
-              <a className="m-1" href="https://github.com/ReadySetJoe"><FontAwesomeIcon icon={faGithub} /></a>
-              <a className="m-1" href="https://www.linkedin.com/in/joe-powers/"><FontAwesomeIcon icon={faLinkedin} /></a>              
+            <div className="ccs-thank-you mr-5 text-left">Created at <a href="https://carolinacodeschool.org/">Carolina Code School</a><br/>Presented Nov, 15th 2019</div>
+            <div className="created-by">branch.out was made by Joe Powers, more of my stuff here:
+              <a className="mx-1" href="https://github.com/ReadySetJoe"><FontAwesomeIcon icon={faGithub} /></a>
+              <a className="mx-1" href="https://www.linkedin.com/in/joe-powers/"><FontAwesomeIcon icon={faLinkedin} /></a>              
             </div>
-            <div className="citations">
-              API's:
-              <div className="citation-spotify"><a href="https://developer.spotify.com/">Spotify API<FontAwesomeIcon icon={faSpotify}/></a></div>
-              {/* <div className="citation-songkick"><a href="https://www.songkick.com/developer">Songkick API</a><img src="./"/></div> */}
+            <div className="citations ml-5 d-flex flex-row align-items-center">
+              <span>API:</span>
+              <div className="citations-api text-left mx-2">
+                <div className="citation-spotify"><a href="https://developer.spotify.com/">Spotify <FontAwesomeIcon icon={faSpotify}/></a></div>
+                <div className="citation-songkick"><a href="https://www.songkick.com/developer">Songkick <img className="songkick-badge-img" alt="songkick badge" src={skBadgePink}/></a></div>
+              </div>
               Style:
-              <div className="citation-fontawesome"></div>
-              <div className="citation-style"></div>
+              <div className="citations-style text-left mx-2">
+                <div className="citation-fontawesome"><a href="https://fontawesome.com/">Font Awesome <FontAwesomeIcon icon={faFontAwesome}/></a></div>
+                <div className="citation-style"><a href="https://github.com/JoeKarlsson/react-spotify-player">Joe Karlssons <FontAwesomeIcon icon={faGithub}/></a></div>
+              </div>
             </div>
 
           </footer>
@@ -640,7 +645,7 @@ class App extends React.Component {
 
           {this.state.token && (
             <div className="w-100 mt-5">
-              <div className='player-wrapper'>
+              <div className='player-wrapper justify-content-center'>
                 {this.state.item.album.images[0].url ? (
                   <Player
                     item={this.state.item}
