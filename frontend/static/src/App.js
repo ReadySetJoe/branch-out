@@ -21,7 +21,7 @@ const SPOTIFY_INTERVAL_LIMITER = true;
 const SK_AUTH_KEY = 'io09K9l3ebJxmxe2'
 
 // Debug Variables
-const API_LIMITER = true; // API Limiter (debug boolean ensuring limited API calling) 
+const API_LIMITER = false; // API Limiter (debug boolean ensuring limited API calling) 
 const SAVE_TO_LOCAL_STORAGE = true;
 
 class App extends React.Component {
@@ -203,17 +203,28 @@ class App extends React.Component {
 
   useNowPlaying() {
     spotifyApi.getArtistRelatedArtists(this.state.item.artists[0].id)
-      .then(data => {
-        let root_artists = data.artists
-        root_artists.unshift(this.state.item.artists[0])
+      .then(res => {
+        console.log('Artists Related to Now Playing:', res)
+        let root_artists = [...this.state.root_artists]
+        root_artists = root_artists.concat(res.artists)
         this.setState({
           root_artists: root_artists,
           use_now_playing: true,
           use_top_artists: false
         })
-        console.log('Artists Related to Now Playing:', data)
       })
       .catch(err => console.log(err))
+      .finally(() => {
+        spotifyApi.getArtist(this.state.item.artists[0].id)
+        .then(res => {
+          console.log('Also, Now Playing Artist:', res)
+          let root_artists = [...this.state.root_artists]
+          root_artists.unshift(res)
+          this.setState({
+            root_artists: root_artists,
+          })        
+        })
+      })
   }
 
   useTopArtists() {
@@ -711,8 +722,6 @@ class App extends React.Component {
             <div># of events found: {this.state.events_all.length}</div>
             <div># of performing artists found: {this.state.events_artists.length}</div>
             <div># of related artists found: {this.state.artists_all.length}</div>
-            <div># of matches found: {this.state.matches.length}</div>
-            <div># of limbs made: {this.state.limbs.length}</div>
           </div>
           
           {/* <div className="separator"></div> */}
