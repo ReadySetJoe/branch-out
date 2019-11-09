@@ -12,7 +12,7 @@ class UserModal extends React.Component {
       {id}
     </div>)
 
-    console.log(this.props.branches)
+    // console.log(this.props.branches)
     return (
       <>
         <Modal className="main" show={this.props.show} onHide={this.props.handleClose}>

@@ -112,46 +112,6 @@ section:nth-child(1) {
   border: none;
 }
 
-/** Animations **/
-.animate {
-  -webkit-animation-duration: 1s;
-  animation-duration: 1s;
-  -webkit-animation-fill-mode: both;
-  animation-fill-mode: both;
-}
-
-/** Used to delay fade in **/
-/* .one {
-  -webkit-animation-delay: 0.4s;
-  -moz-animation-delay: 0.4s;
-  animation-delay: 0.4s;
-} */
-
-/*=== FADE IN  ===*/
-@-webkit-keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-.fadeIn {
-  -webkit-animation-name: fadeIn;
-  animation-name: fadeIn;
-}
-
 /** Player **/
 .player-wrapper {
   margin: 25px;
@@ -165,6 +125,12 @@ section:nth-child(1) {
 /** Location **/
 .location {
   border-top: solid 1px #aaa;
+}
+
+.location-ip {
+  width: 75%;
+  border-right: solid 1px #aaa;
+  justify-content: center;
 }
 
 /** Buttons **/

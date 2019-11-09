@@ -21,7 +21,7 @@ const SPOTIFY_INTERVAL_LIMITER = true;
 const SK_AUTH_KEY = 'io09K9l3ebJxmxe2'
 
 // Debug Variables
-const API_LIMITER = false; // API Limiter (debug boolean ensuring limited API calling) 
+const API_LIMITER = true; // API Limiter (debug boolean ensuring limited API calling) 
 const SAVE_TO_LOCAL_STORAGE = true;
 
 class App extends React.Component {
@@ -55,11 +55,12 @@ class App extends React.Component {
 
       // Location
       navigator_has_geolocation: false,
+      geolocation_complete: false,
       latitude: 0,
       longitude: 0,
-      zipcode: 0,
-      use_zipcode: false,
-      use_latlong: false,
+      city: '',
+      region: '',
+      country_code: '',
 
       // Artists
       artists_all: [],
@@ -124,11 +125,26 @@ class App extends React.Component {
     // Check for Geolocation in Navigator
     this.setState({navigator_has_geolocation: "geolocation" in navigator})
 
+    // Get IP Location (not perfectly accurate but quick and easy)
+    axios.get('http://ip-api.com/json')
+    .then((res) => {
+      console.log('IP lookup', res);
+      this.setState({
+        latitude: res.data.lat,
+        longitude: res.data.lon,
+        city: res.data.city,
+        region: res.data.region,
+        country_code: res.data.countryCode,
+      })
+      this.findEvents()
+    })
+    .catch((err) => console.log(err))
+
     // Reloads user, based on token stored in state
     if (!this.state.token) {
       axios.get(`/api/v1/user-social-auth/`)
         .then(res => {
-          console.log(res)
+          console.log('Check for login:', res)
           spotifyApi.setAccessToken(res.data[0].extra_data.access_token)
           this.getNowPlaying()
           this.setState({
@@ -138,10 +154,10 @@ class App extends React.Component {
             id: res.data[0].id,
           });
           axios.get(`/api/v1/branches/`)
-            .then(res => {console.log(res); this.setState({ branches_user: res.data });})
+            .then(res => {console.log('User Branches:', res); this.setState({ branches_user: res.data });})
             .catch(err => console.log(err))
           axios.get(`/api/v1/limbs/`)
-            .then(res => { console.log(res); this.setState({ limbs_user: res.data });})
+            .then(res => { console.log('User Limbs:', res); this.setState({ limbs_user: res.data });})
             .catch(err => { console.log(err) })
         })
         .catch(err => {console.log(err)})
@@ -166,7 +182,7 @@ class App extends React.Component {
             // use_now_playing: false,
           });
         }
-        console.log(data)
+        console.log('getNowPlaying returned:', data)
       })
       .catch(error => {
         console.log(error)
@@ -195,7 +211,7 @@ class App extends React.Component {
           use_now_playing: true,
           use_top_artists: false
         })
-        console.log(data)
+        console.log('Artists Related to Now Playing:', data)
       })
       .catch(err => console.log(err))
   }
@@ -252,6 +268,26 @@ class App extends React.Component {
     }
   }
 
+  findArtists() {
+    for (let i = 0; i < this.state.root_artists_selected.length; i++) {
+      spotifyApi.getArtistRelatedArtists(this.state.root_artists_selected[i].id)
+        // eslint-disable-next-line no-loop-func
+        .then(res => {
+          let artists_all = [...this.state.artists_all]
+          artists_all = artists_all.concat(res.artists)
+          this.setState({ artists_all: artists_all })
+        })
+        .catch(err => {
+          console.log(err)
+        })
+        .finally(() => {
+          if (i === this.state.root_artists_selected.length-1) { // last pull
+            console.log(`# of artists found: ${this.state.artists_all.length}`)
+          }
+        })
+    }
+  }
+
   useMyLocation(e) {
     e.preventDefault()
     let self = this;
@@ -260,7 +296,10 @@ class App extends React.Component {
         self.setState({
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
-        })
+          geolocation_complete: true,
+          events_all: [],
+        });
+        self.findEvents();
       },
       function error(error_message) {
         console.error('An error has occured while retrieving location', error_message)
@@ -295,8 +334,7 @@ class App extends React.Component {
           console.log(`Which means the site needs to make ${Math.ceil(total_entries / per_page)} calls total`)
           console.log(`and the last call should have ${total_entries % per_page} entries`)
           const num_calls = Math.ceil(total_entries / per_page)
-          let i
-          for (i = 1; i < num_calls; i++) {
+          for (let i = 1; i < num_calls; i++) {
             // Call the next page
             axios({
               method: 'get',
@@ -319,105 +357,53 @@ class App extends React.Component {
                     }
                   }
                 }
-                // console.log(events_all)
                 this.setState({ events_artists: events_artists })
               })
-              .catch(err => {
-                console.log(err)
+              .catch(err => console.log(err))
+              .finally(() => {
+                if (i === num_calls-1) {
+                  console.log('Events Found:', this.state.events_all)
+                  console.log('Performing Artists Found:', this.state.events_artists)
+                }
               })
           }
         }
-        console.log({ events_artists })
       })
       .catch(err => {
         console.log(err)
       })
-  }
-
-  findArtists() {
-    let i;
-    for (i = 0; i < this.state.root_artists_selected.length; i++) {
-      spotifyApi.getArtistRelatedArtists(this.state.root_artists_selected[i].id)
-        // eslint-disable-next-line no-loop-func
-        .then(res => {
-          let artists_all = [...this.state.artists_all]
-          artists_all = artists_all.concat(res.artists)
-          this.setState({ artists_all: artists_all })
-          
-          if (i === this.state.root_artists_selected-1) { // last pull
-            console.log(`# of artists found: ${this.state.artists_all.length}`)}
-        })
-        .catch(err => {
-          console.log(err)
-        })
-    }
-  }
-
-  findMatches() {
-    console.log(`There are ${this.state.events_artists.length} artists from events`)
-    let events_artists = [...this.state.events_artists];
-    const events_artists_unique = [...new Set(events_artists.map(x => x.displayName))];
-    console.log(`${events_artists_unique.length} are unique`)
-
-    console.log(`There are ${this.state.artists_all.length} artists from events`)
-    let artists_all = [...this.state.artists_all];
-    const artists_all_unique = [...new Set(artists_all.map(x => x.name))];
-    console.log(`${artists_all_unique.length} are unique`)
-
-    let i, j, a, b, matches = [];
-    for (i = 0; i < artists_all_unique.length; i++) {
-      a = artists_all_unique[i];
-      for (j = 0; j < events_artists_unique.length; j++) {
-        b = events_artists_unique[j]
-        if (a === b) {
-          matches.push(a)
+      .finally(() => {
+        if (API_LIMITER) {
+          console.log('Events Found:', this.state.events_all)
+          console.log('Performing Artists Found:', this.state.events_artists)
         }
-      }
-    }
-    console.log(`and there are ${matches.length} matches`)
-    console.log(matches)
-    this.setState({ matches: matches })
+      })
   }
 
   makeLimbs() {
-    let j = 0;
-    let matches = [...this.state.matches]
-    let limbs = []
-
-    while (matches.length && j < this.state.artists_all.length) {
-      let a = this.state.artists_all[j]
-      if (matches.includes(a.name)) {
-        spotifyApi.getArtistTopTracks(a.id, "ES")
-          .then(res => {
-            limbs.push({ artist: a, song: res.tracks[0] })
-            let i = 0;
-            let matches_also = [...this.state.matches]
-
-            while (matches_also.length && i < this.state.events_all.length) {
-              let e = this.state.events_all[i]
-              for (let j = 0; j < e.performance.length; j++) {
-                if (matches_also.includes(e.performance[j].artist.displayName)) {
-                  for (let k = 0; k < limbs.length; k++) {
-                    if (limbs[k].artist.name === e.performance[j].artist.displayName) {
-                      limbs[k].event = e
-                      console.log(e)
-                      // limbs.sort((a, b) => b.event.start.date - a.event.start.date)
-                    }
-                  }
-                  matches_also.splice(matches_also.indexOf(e.performance[j].artist.displayName), 1)
-                }
-              }
-              i++;
-            }
-
-            console.log(limbs)
-            this.setState({ limbs: limbs })
-          })
-          .catch(err => console.log(err))
-        matches.splice(matches.indexOf(a.name), 1)
+    let events_all = [...this.state.events_all]
+    let artists_all = [...this.state.artists_all]
+    for (let i = 0; i < artists_all.length; i++) {
+      let a = artists_all[i];
+      for (let j = 0; j < events_all.length; j++) {
+        let b = events_all[j];
+        for (let k = 0; k < b.performance.length; k++) {
+          let c = b.performance[k];
+          if (a.name === c.artist.displayName) {
+            spotifyApi.getArtistTopTracks(a.id, "ES")
+            // eslint-disable-next-line no-loop-func
+            .then(res => {
+              console.log(a, res.tracks[0], b)
+              let limbs = [...this.state.limbs]
+              limbs.push({ artist: a, song: res.tracks[0], event: b})
+              this.setState({ limbs: limbs })
+            })
+            .catch(err => console.log(err))
+          }
+  
+        }
       }
-      j++;
-    }
+    } 
   }
 
   makeBranch(e) {
@@ -583,8 +569,6 @@ class App extends React.Component {
         {limbs}
       </div>
 
-      console.log(this.state.image)
-
     return (
       <div className="App">
         <header className="App-header">
@@ -699,48 +683,40 @@ class App extends React.Component {
             </div>
           </section>
 
-
-          {/* <div className="separator"></div> */}
-
-          {/* {this.state.root_artists_selection_complete && (<section className={`location ${this.state.root_artists_selection_complete ? 'd-flex animate fadeInLeft' : 'd-none'}`}> */}
           {this.state.root_artists_selection_complete && (
             <section className='location d-flex justify-content-center animate fadeInLeft'>
-              <div className={` ${this.state.navigator_has_geolocation ? 'd-flex flex-column' : 'd-none'}`}>
-                <div>Latitude: {this.state.latitude}</div>
-                <div>Longitude: {this.state.longitude}</div>
-                <button className="btn" onClick={this.useMyLocation}>Find My Location</button>
-                {/* <p>~or~</p> */}
+              <div className={`location-ip m-4 ${this.state.city !== '' ? (''): ('d-none')}`}>
+                <h3 className="">Based on your IP address, your location is:</h3>
+                <h2><i>{`${this.state.city}, ${this.state.region}, ${this.state.country_code}`}</i></h2>
               </div>
-              {/* <div>Please enter your zip code: <input type='text'></input></div> */}
+
+              <div className={`location-geo m-4 ${this.state.navigator_has_geolocation ? 'd-flex flex-column' : 'd-none'}`}>
+                <h4>Not your location? Click below for a better guess:</h4>
+                {!this.state.geolocation_complete ? 
+                (<button className="btn" onClick={this.useMyLocation}>Find My Location</button>)
+                 : (<button className="btn btn-selected">Found!</button>)}
+              </div>
+              <div className={`location-zip m-4 ${!this.state.navigator_has_geolocation ? 'd-flex' : 'd-none'}`}>
+                <div>We're sorry, your browser doesn't support geolocation :(</div>
+                <div>Location by US zipcode is still currently in development</div>
+              </div>
             </section>
           )}
 
-          {/* <div className="separator"></div> */}
-
           <div className={` ${this.state.root_artists_selection_complete && this.state.latitude !== 0 ? 'd-flex flex-column' : 'd-none'}`}>
             Let's do the thing
-            <br />
-            <button className="btn" onClick={() => this.findEvents()}>Find Events</button>
-            # of events found: {this.state.events_all.length} <br />
-            # of artist from those events: {this.state.events_artists.length}
-            <br />
-            <button className="btn" onClick={() => this.findArtists()}>Find Artists</button>
-            
-            <br />
-            <button className="btn" onClick={() => this.findMatches()}>Find Matches</button>
-            # of matches found: {this.state.matches.length}
-            <br />
-            <button className="btn" onClick={() => this.makeLimbs()}>Make Limbs</button>
-            # of limbs made: {this.state.limbs.length}
-            <br />
-            <button className="btn" onClick={() => this.makeBranch()}>Make Branch</button>
-            <br />
+            <button className="btn" onClick={() => this.makeLimbs()}>Begin</button>
+            <div># of events found: {this.state.events_all.length}</div>
+            <div># of performing artists found: {this.state.events_artists.length}</div>
+            <div># of related artists found: {this.state.artists_all.length}</div>
+            <div># of matches found: {this.state.matches.length}</div>
+            <div># of limbs made: {this.state.limbs.length}</div>
           </div>
           
           {/* <div className="separator"></div> */}
 
           {this.state.limbs.length > 0 && (
-            <section>
+            <section className="animate fadeInUp">
               <header>
                 <form  onSubmit={this.makeBranch} className="new-branch-form d-flex flex-row align-items-center justify-content-around">
                   <button type='button' icon="file" onClick={() => this.myRef.current.click()} className="btn branch-img-preview-btn">
