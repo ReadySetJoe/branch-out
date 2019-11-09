@@ -1,7 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSync} from '@fortawesome/free-solid-svg-icons';
+import { faSync } from '@fortawesome/free-solid-svg-icons';
 import { faPagelines, faGithub, faLinkedin, faFontAwesome, faSpotify } from '@fortawesome/free-brands-svg-icons';
 import skBadgePink from './images/sk-badge-pink.svg';
 import poweredBySongkickPink from './images/powered-by-songkick-pink.svg';
@@ -16,7 +16,7 @@ axios.defaults.xsrfHeaderName = 'X-CSRFToken';
 
 const spotifyApi = new SpotifyWebApi();
 const SPOTIFY_API_INTERVAL_SECS = 1;
-const SPOTIFY_INTERVAL_LIMITER = false;
+const SPOTIFY_INTERVAL_LIMITER = true;
 
 const SK_AUTH_KEY = 'io09K9l3ebJxmxe2'
 
@@ -52,6 +52,7 @@ class App extends React.Component {
       use_now_playing: false,
       use_top_artists: false,
       root_artists_selection_complete: false,
+      genre_set: new Set(),
 
       // Location
       navigator_has_geolocation: false,
@@ -102,49 +103,53 @@ class App extends React.Component {
     this.load = this.load.bind(this);
     this.handleLimbDelete = this.handleLimbDelete.bind(this);
     this.handleBranchDelete = this.handleBranchDelete.bind(this);
-    
+
   }
 
   componentDidMount() {
     // Generates random branch name
-    const NAME_ADJ = [	'accessible',	'accomplished',	'ambitious',	'assured',	'bangin',	'beautiful',	'blissful',	'bold',	'breathtaking',	'brilliant',	'catchy',	'cerebral',	'classic',	'clean',	'clever',	'cleverly-written',	'cohesive',	'complex',	'conceptual',	'danceable',	'definitive',	'deftly-produced',	'delightful',	'dynamic',	'ebullient',	'eclectic',	'ecstatic',	'effortless',	'emotionally-rich',	'endlessly-playable',	'enigmatic',	'enterntaining',	'epic',	'ethereal',	'exceptional',	'exhilarating',	'expansive',	'notable',	'nuanced',	'number',	'operatic',	'passionate',	'percussion-saoked',	'perfect',	'piercing',	'playful',	'poetic',	'poignant',	'polished',	'primal',	'progressive',	'radical',	'raw',	'refined',	'refrain',	'relentless',	'reliably-solid',	'reverbed',	'rhythimic',	'riotous',	'riveting',	'rollicking',	'satisfying',	'saturated',	'sculptural',	'seductive',	'sensitive',	'skilled',	'skillful',	'soaring',	'solid',	'sombre',	'sonic',	'sophisticated',	'feel-good',	'finely-calibrated',	'flawless',	'fluid',	'focused',	'fresh',	'funky',	'grandiose',	'groundbreaking',	'harmonic',	'harmonically-rich',	'headbanging',	'heartfelt',	'hi-fi',	'highly-listenable',	'highly-recommended',	'hypnotic',	'indulgent',	'innocent',	'instrospective',	'instrumental',	'intoxicating',	'inventice',	'invigorating',	'inviting',	'latest',	'layered',	'limitless',	'listenable',	'lush',	'lyrical',	'masterful',	'mesmerizing',	'midtempo',	'moody',	'musical',	'mythical',	'sprawling',	'staccato',	'stratospheric',	'strident',	'striking',	'studied',	'stunning',	'stylish',	'stylistic',	'sublime',	'successful',	'surprising',	'symphonic',	'synthetic',	'talented',	'tender',	'textured',	'thrilling',	'throbbing',	'thunderous',	'tight',	'timeless',	'top-flight',	'trademark',	'trailblazing',	'transcendent',	'transporting',	'unexpected',	'unfied',	'unique',	'unpredictable',	'unsung',	'upbeat',	'visionary',	'vocal',	'well-rounded',	'well-tooled',]
-    const NAME_NOUN = [	'Alder',	'Apple',	'Ash',	'Aspen',	'Basswood',	'Birch',	'Buckeye',	'Buckthorn',	'California-laurel',	'Catalpa',	'Cedar',	'Cherry',	'Chestnut',	'Chinkapin',	'Cottonwood',	'Cypress',	'Dogwood',	'Douglas-fir',	'Elm',	'Filbert',	'Fir',	'Giant',	'Hawthorn',	'Hazel',	'Hemlock',	'Holly',	'Honeylocust',	'Horsechestnut',	'Incense-cedar',	'Juniper',	'Larch',	'Locust',	'Madrone',	'Maple',	'Mountain-ash',	'Mountain-mahogany',	'Oak',	'Oregon-myrtle',	'Pear',	'Pine',	'Plum',	'Poplar',	'Redcedar/Arborvitae',	'Redwood',	'Russian-olive',	'Spruce',	'Sweetgum',	'Sycamore',	'Tanoak',	'Walnut',	'White-cedar',	'Willow',	'Yellow-poplar',	'Yew',]
-    
+    const NAME_ADJ = ['accessible', 'accomplished', 'ambitious', 'assured', 'bangin', 'beautiful', 'blissful', 'bold', 'breathtaking', 'brilliant', 'catchy', 'cerebral', 'classic', 'clean', 'clever', 'cleverly-written', 'cohesive', 'complex', 'conceptual', 'danceable', 'definitive', 'deftly-produced', 'delightful', 'dynamic', 'ebullient', 'eclectic', 'ecstatic', 'effortless', 'emotionally-rich', 'endlessly-playable', 'enigmatic', 'enterntaining', 'epic', 'ethereal', 'exceptional', 'exhilarating', 'expansive', 'notable', 'nuanced', 'number', 'operatic', 'passionate', 'percussion-saoked', 'perfect', 'piercing', 'playful', 'poetic', 'poignant', 'polished', 'primal', 'progressive', 'radical', 'raw', 'refined', 'refrain', 'relentless', 'reliably-solid', 'reverbed', 'rhythimic', 'riotous', 'riveting', 'rollicking', 'satisfying', 'saturated', 'sculptural', 'seductive', 'sensitive', 'skilled', 'skillful', 'soaring', 'solid', 'sombre', 'sonic', 'sophisticated', 'feel-good', 'finely-calibrated', 'flawless', 'fluid', 'focused', 'fresh', 'funky', 'grandiose', 'groundbreaking', 'harmonic', 'harmonically-rich', 'headbanging', 'heartfelt', 'hi-fi', 'highly-listenable', 'highly-recommended', 'hypnotic', 'indulgent', 'innocent', 'instrospective', 'instrumental', 'intoxicating', 'inventice', 'invigorating', 'inviting', 'latest', 'layered', 'limitless', 'listenable', 'lush', 'lyrical', 'masterful', 'mesmerizing', 'midtempo', 'moody', 'musical', 'mythical', 'sprawling', 'staccato', 'stratospheric', 'strident', 'striking', 'studied', 'stunning', 'stylish', 'stylistic', 'sublime', 'successful', 'surprising', 'symphonic', 'synthetic', 'talented', 'tender', 'textured', 'thrilling', 'throbbing', 'thunderous', 'tight', 'timeless', 'top-flight', 'trademark', 'trailblazing', 'transcendent', 'transporting', 'unexpected', 'unfied', 'unique', 'unpredictable', 'unsung', 'upbeat', 'visionary', 'vocal', 'well-rounded', 'well-tooled',]
+    const NAME_NOUN = ['Alder', 'Apple', 'Ash', 'Aspen', 'Basswood', 'Birch', 'Buckeye', 'Buckthorn', 'California-laurel', 'Catalpa', 'Cedar', 'Cherry', 'Chestnut', 'Chinkapin', 'Cottonwood', 'Cypress', 'Dogwood', 'Douglas-fir', 'Elm', 'Filbert', 'Fir', 'Giant', 'Hawthorn', 'Hazel', 'Hemlock', 'Holly', 'Honeylocust', 'Horsechestnut', 'Incense-cedar', 'Juniper', 'Larch', 'Locust', 'Madrone', 'Maple', 'Mountain-ash', 'Mountain-mahogany', 'Oak', 'Oregon-myrtle', 'Pear', 'Pine', 'Plum', 'Poplar', 'Redcedar/Arborvitae', 'Redwood', 'Russian-olive', 'Spruce', 'Sweetgum', 'Sycamore', 'Tanoak', 'Walnut', 'White-cedar', 'Willow', 'Yellow-poplar', 'Yew',]
+
     const BRANCH_ADJ_1 = NAME_ADJ[Math.floor(Math.random() * NAME_ADJ.length)];
     const BRANCH_ADJ_2 = NAME_ADJ[Math.floor(Math.random() * NAME_ADJ.length)];
     const BRANCH_NOUN = NAME_NOUN[Math.floor(Math.random() * NAME_NOUN.length)];
 
-    this.setState({branch_name: `${BRANCH_ADJ_1.toLowerCase()}-${BRANCH_ADJ_2.toLowerCase()}-${BRANCH_NOUN.toLowerCase()}`})
+    this.setState({ branch_name: `${BRANCH_ADJ_1.toLowerCase()}-${BRANCH_ADJ_2.toLowerCase()}-${BRANCH_NOUN.toLowerCase()}` })
 
     // Setting interval for automated getNowPlaying() calls
     if (!SPOTIFY_INTERVAL_LIMITER) {
       let intervalID = setInterval(() => this.getNowPlaying(), SPOTIFY_API_INTERVAL_SECS * 1000);
-      this.setState({intervalID: intervalID})  
+      this.setState({ intervalID: intervalID })
     }
 
     // Check for Geolocation in Navigator
-    this.setState({navigator_has_geolocation: "geolocation" in navigator})
+    this.setState({ navigator_has_geolocation: "geolocation" in navigator })
 
     // Get IP Location (not perfectly accurate but quick and easy)
     axios.get('http://ip-api.com/json')
-    .then((res) => {
-      console.log('IP lookup', res);
-      this.setState({
-        latitude: res.data.lat,
-        longitude: res.data.lon,
-        city: res.data.city,
-        region: res.data.region,
-        country_code: res.data.countryCode,
+      .then((res) => {
+        console.log('IP lookup', res);
+        this.setState({
+          latitude: res.data.lat,
+          longitude: res.data.lon,
+          city: res.data.city,
+          region: res.data.region,
+          country_code: res.data.countryCode,
+        })
+        this.findEvents()
       })
-      this.findEvents()
-    })
-    .catch((err) => console.log(err))
+      .catch((err) => console.log(err))
 
     // Reloads user, based on token stored in state
     if (!this.state.token) {
       axios.get(`/api/v1/user-social-auth/`)
         .then(res => {
           console.log('Check for login:', res)
+          // const SOME_EXPIRED_TOKEN_CHECK = false
+          // if (SOME_EXPIRED_TOKEN_CHECK) {
+          //   axios.post(`https://accounts.spotify.com/api/token?grant_type=refresh_token&refresh_token=${res.data[0].extra_data.refresh_token}`)
+          // }
           spotifyApi.setAccessToken(res.data[0].extra_data.access_token)
           this.getNowPlaying()
           this.setState({
@@ -154,22 +159,22 @@ class App extends React.Component {
             id: res.data[0].id,
           });
           axios.get(`/api/v1/branches/`)
-            .then(res => {console.log('User Branches:', res); this.setState({ branches_user: res.data });})
+            .then(res => { console.log('User Branches:', res); this.setState({ branches_user: res.data }); })
             .catch(err => console.log(err))
           axios.get(`/api/v1/limbs/`)
-            .then(res => { console.log('User Limbs:', res); this.setState({ limbs_user: res.data });})
+            .then(res => { console.log('User Limbs:', res); this.setState({ limbs_user: res.data }); })
             .catch(err => { console.log(err) })
         })
-        .catch(err => {console.log(err)})
+        .catch(err => { console.log(err) })
     } else {
       this.getNowPlaying()
     }
   }
- 
- componentWillUnmount() {
+
+  componentWillUnmount() {
     // use intervalID from the state to clear the interval
     clearInterval(this.state.intervalID);
- }
+  }
 
   getNowPlaying() {
     spotifyApi.getMyCurrentPlaybackState()
@@ -179,10 +184,8 @@ class App extends React.Component {
             item: data.item,
             is_playing: data.is_playing,
             progress_ms: data.progress_ms,
-            // use_now_playing: false,
           });
         }
-        console.log('getNowPlaying returned:', data)
       })
       .catch(error => {
         console.log(error)
@@ -205,26 +208,21 @@ class App extends React.Component {
     spotifyApi.getArtistRelatedArtists(this.state.item.artists[0].id)
       .then(res => {
         console.log('Artists Related to Now Playing:', res)
-        let root_artists = [...this.state.root_artists]
-        root_artists = root_artists.concat(res.artists)
-        this.setState({
-          root_artists: root_artists,
-          use_now_playing: true,
-          use_top_artists: false
-        })
+        let root_artists = res.artists
+        spotifyApi.getArtist(this.state.item.artists[0].id)
+          .then(res => {
+            console.log('Also, Now Playing Artist:', res)
+            root_artists.unshift(res)
+            this.setState({
+              root_artists: root_artists,
+              use_now_playing: true,
+              use_top_artists: false,
+              genre_set: new Set(),
+            })
+          })
+          .catch(err => console.log(err))
       })
       .catch(err => console.log(err))
-      .finally(() => {
-        spotifyApi.getArtist(this.state.item.artists[0].id)
-        .then(res => {
-          console.log('Also, Now Playing Artist:', res)
-          let root_artists = [...this.state.root_artists]
-          root_artists.unshift(res)
-          this.setState({
-            root_artists: root_artists,
-          })        
-        })
-      })
   }
 
   useTopArtists() {
@@ -234,7 +232,8 @@ class App extends React.Component {
         this.setState({
           root_artists: data.items,
           use_top_artists: true,
-          use_now_playing: false
+          use_now_playing: false,
+          genre_set: new Set(),
         })
       })
       .catch(err => {
@@ -285,16 +284,24 @@ class App extends React.Component {
       spotifyApi.getArtistRelatedArtists(this.state.root_artists_selected[i].id)
         // eslint-disable-next-line no-loop-func
         .then(res => {
+          console.log('this is the res ', res)
           let artists_all = [...this.state.artists_all]
           artists_all = artists_all.concat(res.artists)
-          this.setState({ artists_all: artists_all })
+
+          let new_genre_set = res.artists.map(artist => (artist.genres)).values()
+          new_genre_set = new Set(Array.from(new_genre_set).flat())
+          let genre_set = new Set([...this.state.genre_set, ...new_genre_set])
+
+          this.setState({ artists_all: artists_all, genre_set: genre_set })
         })
         .catch(err => {
           console.log(err)
         })
         .finally(() => {
-          if (i === this.state.root_artists_selected.length-1) { // last pull
+          if (i === this.state.root_artists_selected.length - 1) { // last pull
             console.log(`# of artists found: ${this.state.artists_all.length}`)
+            console.log(`# of genres found: ${this.state.genre_set.length}`)
+            console.log('genres found: ', this.state.genre_set)
           }
         })
     }
@@ -373,7 +380,7 @@ class App extends React.Component {
               })
               .catch(err => console.log(err))
               .finally(() => {
-                if (i === num_calls-1) {
+                if (i === num_calls - 1) {
                   console.log('Events Found:', this.state.events_all)
                   console.log('Performing Artists Found:', this.state.events_artists)
                 }
@@ -405,32 +412,32 @@ class App extends React.Component {
           if (a.name === c.artist.displayName && !unique_names.includes(a.name)) {
             unique_names.push(a.name)
             spotifyApi.getArtistTopTracks(a.id, "ES")
-            // eslint-disable-next-line no-loop-func
-            .then(res => {
-              console.log(a, res.tracks[0], b)
-              let limbs = [...this.state.limbs]
-              let limb = { artist: a, song: res.tracks[0], event: b}
-              if (!limbs.includes(limb)) {
-                limbs.push(limb)
-                this.setState({ limbs: limbs })
-              }
-            })
-            .catch(err => console.log(err))
+              // eslint-disable-next-line no-loop-func
+              .then(res => {
+                console.log(a, res.tracks[0], b)
+                let limbs = [...this.state.limbs]
+                let limb = { artist: a, song: res.tracks[0], event: b }
+                if (!limbs.includes(limb)) {
+                  limbs.push(limb)
+                  this.setState({ limbs: limbs })
+                }
+              })
+              .catch(err => console.log(err))
           }
-  
+
         }
       }
-    } 
+    }
   }
 
   makeBranch(e) {
     e.preventDefault()
     let branches_user = [...this.state.branches_user]
     branches_user.push(this.state.branch)
-    this.setState({branches_user: branches_user})
+    this.setState({ branches_user: branches_user })
 
     let branch_data = new FormData();
-    if (this.state.image) {branch_data.append('cover', this.state.image)}
+    if (this.state.image) { branch_data.append('cover', this.state.image) }
     let limbs = []
     for (let i = 0; i < this.state.limbs.length; i++) {
       let limb = {
@@ -469,42 +476,43 @@ class App extends React.Component {
 
   handleBranchDelete(branch) {
     axios.delete(`/api/v1/branch/${branch.id}/`)
-    .then(res => {
-      let branches_user = [...this.state.branches_user]
-      let ndx = branches_user.indexOf(branch)
-      branches_user.splice(ndx,1) 
-      this.setState({branches_user})
-    })
-    .catch(error => {
-      console.log(error)
-    })
+      .then(res => {
+        let branches_user = [...this.state.branches_user]
+        let ndx = branches_user.indexOf(branch)
+        branches_user.splice(ndx, 1)
+        this.setState({ branches_user })
+      })
+      .catch(error => {
+        console.log(error)
+      })
   }
 
   handleLimbDelete(limb) {
     axios.delete(`/api/v1/limb/${limb.id}/`)
-    .then(res => {console.log(res)})
-    .catch(error => {console.log(error)})
-    .finally(() => {
-      let limbs = [...this.state.limbs]
-      let ndx = limbs.indexOf(limb)
-      limbs.splice(ndx,1) 
-      this.setState({limbs})}
-    )
+      .then(res => { console.log(res) })
+      .catch(error => { console.log(error) })
+      .finally(() => {
+        let limbs = [...this.state.limbs]
+        let ndx = limbs.indexOf(limb)
+        limbs.splice(ndx, 1)
+        this.setState({ limbs })
+      }
+      )
 
   }
 
   handleChange(e) {
-    this.setState({[e.target.name]: e.target.value});
+    this.setState({ [e.target.name]: e.target.value });
   }
 
   handleImageChange(e) {
     let file = e.target.files[0];
     // console.log(file)
-    this.setState({image: file});
-    
+    this.setState({ image: file });
+
     let reader = new FileReader();
     reader.onloadend = () => {
-      this.setState({preview: reader.result})
+      this.setState({ preview: reader.result })
     };
 
     reader.readAsDataURL(file);
@@ -537,6 +545,7 @@ class App extends React.Component {
     state.uid = this.state.uid;
     state.id = this.state.id;
     state.show_modal = this.state.show_modal;
+    state.genre_set = this.state.genre_set;
     localStorage.setItem('state', JSON.stringify(state))
     console.log('State Saved!')
     console.log(state)
@@ -597,25 +606,25 @@ class App extends React.Component {
             </div>
           )}
 
-          <Modal 
+          <Modal
             show={this.state.show_modal}
             branches={this.state.branches_user}
             limbs={this.state.limbs_user}
-            handleClose={() => this.setState({show_modal: false})}
+            handleClose={() => this.setState({ show_modal: false })}
           />
-          
+
           <h1 className={`${this.state.token ? ('title') : ('title title-login animate fadeInUp one')}`}>branch.out</h1>
           {!this.state.token && (
             <div className="d-flex flex-column align-items-center animate fadeInUp two">
-              <FontAwesomeIcon className="my-2" icon={faPagelines}/>
+              <FontAwesomeIcon className="my-2" icon={faPagelines} />
               <h3 className="my-2">Welcome to branch.out</h3>
               <h3 className="my-2">A site that helps people find new music, coming to a nearby stage</h3>
               <h3 className="my-2">Let's find the the next concert you will never forget</h3>
-              <FontAwesomeIcon className="my-2" icon={faPagelines}/>
+              <FontAwesomeIcon className="my-2" icon={faPagelines} />
               <a className="btn btn-login animate fadeInUp three my-3" href="/social/login/spotify/">Login to Spotify</a>
-          </div>
+            </div>
           )}
-          
+
           <nav className="scrollspy-placeholder fixed-left"><ul></ul></nav>
           {this.state.token && (
             <div>
@@ -634,21 +643,21 @@ class App extends React.Component {
           )}
 
           <footer className="bottom-bar fixed-bottom d-flex align-items-center justify-content-between p-2">
-            <div className="ccs-thank-you mr-5 text-left">Created at <a href="https://carolinacodeschool.org/">Carolina Code School</a><br/>Presented Nov, 15th 2019</div>
+            <div className="ccs-thank-you mr-5 text-left">Created at <a href="https://carolinacodeschool.org/">Carolina Code School</a><br />Presented Nov, 15th 2019</div>
             <div className="created-by">branch.out was made by Joe Powers, more of my stuff here:
               <a className="mx-1" href="https://github.com/ReadySetJoe"><FontAwesomeIcon icon={faGithub} /></a>
-              <a className="mx-1" href="https://www.linkedin.com/in/joe-powers/"><FontAwesomeIcon icon={faLinkedin} /></a>              
+              <a className="mx-1" href="https://www.linkedin.com/in/joe-powers/"><FontAwesomeIcon icon={faLinkedin} /></a>
             </div>
             <div className="citations ml-5 d-flex flex-row align-items-center">
               <span>API:</span>
               <div className="citations-api text-left mx-2">
-                <div className="citation-spotify"><a href="https://developer.spotify.com/">Spotify <FontAwesomeIcon icon={faSpotify}/></a></div>
-                <div className="citation-songkick"><a href="https://www.songkick.com/developer">Songkick <img className="songkick-badge-img" alt="songkick badge" src={skBadgePink}/></a></div>
+                <div className="citation-spotify"><a href="https://developer.spotify.com/">Spotify <FontAwesomeIcon icon={faSpotify} /></a></div>
+                <div className="citation-songkick"><a href="https://www.songkick.com/developer">Songkick <img className="songkick-badge-img" alt="songkick badge" src={skBadgePink} /></a></div>
               </div>
               Style:
               <div className="citations-style text-left mx-2">
-                <div className="citation-fontawesome"><a href="https://fontawesome.com/">Font Awesome <FontAwesomeIcon icon={faFontAwesome}/></a></div>
-                <div className="citation-style"><a href="https://github.com/JoeKarlsson/react-spotify-player">Joe Karlssons <FontAwesomeIcon icon={faGithub}/></a></div>
+                <div className="citation-fontawesome"><a href="https://fontawesome.com/">Font Awesome <FontAwesomeIcon icon={faFontAwesome} /></a></div>
+                <div className="citation-style"><a href="https://github.com/JoeKarlsson/react-spotify-player">Joe Karlssons <FontAwesomeIcon icon={faGithub} /></a></div>
               </div>
             </div>
 
@@ -672,8 +681,8 @@ class App extends React.Component {
                 {SPOTIFY_INTERVAL_LIMITER && (<button className='btn p-1 refresh-btn' onClick={() => this.getNowPlaying()}><span className="p-1"><FontAwesomeIcon icon={faSync} /></span></button>)}
               </section>
 
-              <div className="separator"></div>
-              
+              {/* <div className="separator"></div> */}
+
               <button className={`btn ${this.state.use_now_playing ? 'btn-selected' : ''} `} onClick={() => this.useNowPlaying()}>Use Artists Related to Now Playing</button>
               <button className={`btn ${this.state.use_top_artists ? 'btn-selected' : ''} `} onClick={() => this.useTopArtists()}>Use Your Top Artists</button>
             </div>
@@ -708,16 +717,16 @@ class App extends React.Component {
 
           {this.state.root_artists_selection_complete && (
             <section className='location d-flex justify-content-center animate fadeInLeft'>
-              <div className={`location-ip m-4 ${this.state.city !== '' ? (''): ('d-none')}`}>
+              <div className={`location-ip p-3 m-4 ${this.state.city !== '' ? ('') : ('d-none')}`}>
                 <h3 className="">Based on your IP address, your location is:</h3>
                 <h2><i>{`${this.state.city}, ${this.state.region}, ${this.state.country_code}`}</i></h2>
               </div>
 
               <div className={`location-geo m-4 ${this.state.navigator_has_geolocation ? 'd-flex flex-column' : 'd-none'}`}>
                 <h4>Not your location? Click below for a better guess:</h4>
-                {!this.state.geolocation_complete ? 
-                (<button className="btn" onClick={this.useMyLocation}>Find My Location</button>)
-                 : (<button className="btn btn-selected">Found!</button>)}
+                {!this.state.geolocation_complete ?
+                  (<button className="btn m-auto" onClick={this.useMyLocation}>Find My Location</button>)
+                  : (<button className="btn btn-selected">Found!</button>)}
               </div>
               <div className={`location-zip m-4 ${!this.state.navigator_has_geolocation ? 'd-flex' : 'd-none'}`}>
                 <div>We're sorry, your browser doesn't support geolocation :(</div>
@@ -732,30 +741,31 @@ class App extends React.Component {
             <div># of events found: {this.state.events_all.length}</div>
             <div># of performing artists found: {this.state.events_artists.length}</div>
             <div># of related artists found: {this.state.artists_all.length}</div>
+            <div># of genres found: {this.state.genre_set.length}</div>
           </div>
-          
+
           {/* <div className="separator"></div> */}
 
           {this.state.limbs.length > 0 && (
             <section className="animate fadeInUp">
               <header>
-                <form  onSubmit={this.makeBranch} className="new-branch-form d-flex flex-row align-items-center justify-content-around">
+                <form onSubmit={this.makeBranch} className="new-branch-form d-flex flex-row align-items-center justify-content-around">
                   <button type='button' icon="file" onClick={() => this.myRef.current.click()} className="btn branch-img-preview-btn">
                     {this.state.image ? (
                       <img className="branch-img-preview" src={this.state.preview} alt='branch cover preview' width="200" />
                     ) : (
-                      <div>
-                        <FontAwesomeIcon icon={faPagelines} className="fa-7x"/>
-                        <br/>
-                        <p>cover image upload</p>
-                      </div>
-                    )}
+                        <div>
+                          <FontAwesomeIcon icon={faPagelines} className="fa-7x" />
+                          <br />
+                          <p>cover image upload</p>
+                        </div>
+                      )}
                   </button>
-                  <input className="d-none" ref={this.myRef} type='file' name='image' onChange={this.handleImageChange}/>             
+                  <input className="d-none" ref={this.myRef} type='file' name='image' onChange={this.handleImageChange} />
                   <div className="text-left">
                     <h3>Here's your new branch, let's give it a name:</h3>
-                    <br/>
-                    <input className="branch-name-input" name="branch_name" value={this.state.branch_name} onChange={this.handleChange} type="text"/>
+                    <br />
+                    <input className="branch-name-input" name="branch_name" value={this.state.branch_name} onChange={this.handleChange} type="text" />
                   </div>
                   <button className="btn" type="submit" value="save">Add to My Branches</button>
                 </form>

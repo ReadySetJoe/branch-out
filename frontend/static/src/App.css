@@ -107,9 +107,7 @@ section:nth-child(1) {
 
 /** Player **/
 .player-wrapper {
-  margin: 25px;
   padding: 25px;
-  /* border-bottom: solid 1px #aaa; */
 }
 
 /** Artist Selection **/
