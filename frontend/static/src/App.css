@@ -120,6 +120,15 @@ section:nth-child(1) {
 }
 
 /** Artist Selection **/
+.root-artist-img {
+  margin-right: 5px;
+  margin-bottom: -8px;
+  margin-top: -8px;
+  margin-left: -18px;
+  height: 44px;
+  width: 44px;
+  border-radius: 50%;
+}
 
 
 /** Location **/

@@ -219,6 +219,7 @@ class App extends React.Component {
   useTopArtists() {
     spotifyApi.getMyTopArtists()
       .then(data => {
+        console.log('Top Artists: ', data)
         this.setState({
           root_artists: data.items,
           use_top_artists: true,
@@ -538,6 +539,7 @@ class App extends React.Component {
         className={`btn root-artist-btn ${this.state.root_artists_selected.includes(artist) ? ('btn-selected') : ('')}`}
         onClick={() => this.selectArtist(artist)}
       >
+        <img className="root-artist-img" src={artist.images[0].url} alt={`profile for ${artist.name}`}></img>
         {artist.name}
       </button>
     )
