@@ -16,13 +16,13 @@ axios.defaults.xsrfHeaderName = 'X-CSRFToken';
 
 const spotifyApi = new SpotifyWebApi();
 const SPOTIFY_API_INTERVAL_SECS = 1;
-const SPOTIFY_INTERVAL_LIMITER = true;
+const SPOTIFY_INTERVAL_LIMITER = false;
 
 const SK_AUTH_KEY = 'io09K9l3ebJxmxe2'
 
 // Debug Variables
 const API_LIMITER = false; // API Limiter (debug boolean ensuring limited API calling) 
-const SAVE_TO_LOCAL_STORAGE = true;
+const SAVE_TO_LOCAL_STORAGE = false;
 
 class App extends React.Component {
   constructor(props) {
@@ -395,20 +395,25 @@ class App extends React.Component {
   makeLimbs() {
     let events_all = [...this.state.events_all]
     let artists_all = [...this.state.artists_all]
+    let unique_names = []
     for (let i = 0; i < artists_all.length; i++) {
       let a = artists_all[i];
       for (let j = 0; j < events_all.length; j++) {
         let b = events_all[j];
         for (let k = 0; k < b.performance.length; k++) {
           let c = b.performance[k];
-          if (a.name === c.artist.displayName) {
+          if (a.name === c.artist.displayName && !unique_names.includes(a.name)) {
+            unique_names.push(a.name)
             spotifyApi.getArtistTopTracks(a.id, "ES")
             // eslint-disable-next-line no-loop-func
             .then(res => {
               console.log(a, res.tracks[0], b)
               let limbs = [...this.state.limbs]
-              limbs.push({ artist: a, song: res.tracks[0], event: b})
-              this.setState({ limbs: limbs })
+              let limb = { artist: a, song: res.tracks[0], event: b}
+              if (!limbs.includes(limb)) {
+                limbs.push(limb)
+                this.setState({ limbs: limbs })
+              }
             })
             .catch(err => console.log(err))
           }
@@ -599,7 +604,18 @@ class App extends React.Component {
             handleClose={() => this.setState({show_modal: false})}
           />
           
-          <h1 className={`${this.state.token ? ('title') : ('title title-login')}`}>branch.out</h1>
+          <h1 className={`${this.state.token ? ('title') : ('title title-login animate fadeInUp one')}`}>branch.out</h1>
+          {!this.state.token && (
+            <div className="d-flex flex-column align-items-center animate fadeInUp two">
+              <FontAwesomeIcon className="my-2" icon={faPagelines}/>
+              <h3 className="my-2">Welcome to branch.out</h3>
+              <h3 className="my-2">A site that helps people find new music, coming to a nearby stage</h3>
+              <h3 className="my-2">Let's find the the next concert you will never forget</h3>
+              <FontAwesomeIcon className="my-2" icon={faPagelines}/>
+              <a className="btn btn-login animate fadeInUp three my-3" href="/social/login/spotify/">Login to Spotify</a>
+          </div>
+          )}
+          
           <nav className="scrollspy-placeholder fixed-left"><ul></ul></nav>
           {this.state.token && (
             <div>
@@ -637,12 +653,6 @@ class App extends React.Component {
             </div>
 
           </footer>
-
-          {!this.state.token && (
-            <div className="my-5">
-              <a className="btn btn--loginApp-link" href="/social/login/spotify/">Login to Spotify</a>
-            </div>
-          )}
 
           {this.state.token && (
             <div className="w-100">
@@ -743,7 +753,7 @@ class App extends React.Component {
                   </button>
                   <input className="d-none" ref={this.myRef} type='file' name='image' onChange={this.handleImageChange}/>             
                   <div className="text-left">
-                    <label>Here's your new branch, let's give it a name:</label>
+                    <h3>Here's your new branch, let's give it a name:</h3>
                     <br/>
                     <input className="branch-name-input" name="branch_name" value={this.state.branch_name} onChange={this.handleChange} type="text"/>
                   </div>

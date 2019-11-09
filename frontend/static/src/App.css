@@ -59,13 +59,6 @@ body {
   align-self: center;
 }
 
-.title-login::after {
-  content: "Welcome, this is branch.out\A A site that helps people find new music, coming to a nearby stage soon.\ALet's find the the next concert you'll never forget";
-  font-size: large;
-  white-space: pre-wrap;
-  margin-top: 10px;
-}
-
 .top-bar {
   background-color: #282c34;
   opacity: 0.6;
@@ -142,6 +135,16 @@ section:nth-child(1) {
   justify-content: center;
 }
 
+/** Branches **/
+.branch-name-input {
+  text-align: left;
+  width: 100%;
+  color: white;
+  background: linear-gradient(45deg, black, transparent);
+  border: none;
+  padding: 10px;
+}
+
 /** Buttons **/
 
 .btn {
@@ -187,8 +190,8 @@ section:nth-child(1) {
 .btn-disabled:hover {
   cursor: default;
 }
-.btn--login {
-  margin: 0 auto;
+.btn-login {
+  font-size: large;
 }
 
 .btn-logout {
@@ -279,6 +282,7 @@ section:nth-child(1) {
   display: flex;
   align-items: center;
   position: relative;
+  font-size: 16px;
 }
   
 .limb:hover {
@@ -309,6 +313,26 @@ section:nth-child(1) {
   -webkit-animation-fill-mode: both;
   animation-fill-mode: both;
 }
+
+/*=== Optional Delays, change values here  ===*/
+.one {
+  -webkit-animation-delay: 0.4s;
+  -moz-animation-delay: 0.4s;
+  animation-delay: 0.4s;
+  }
+  
+  .two {
+  -webkit-animation-delay: 1.7s;
+  -moz-animation-delay: 1.7s;
+  animation-delay: 1.7s;
+  }
+  
+  .three {
+  -webkit-animation-delay: 3s;
+  -moz-animation-delay: 3s;
+  animation-delay: 3s;
+  }
+  
 /*=== Animations start here  ===*/
 /*=== FADE IN  ===*/
 @-webkit-keyframes fadeIn {
