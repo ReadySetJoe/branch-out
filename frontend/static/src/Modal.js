@@ -14,28 +14,51 @@ import { faPagelines } from '@fortawesome/free-brands-svg-icons';
 
 class UserModal extends React.Component {
   render() {
-    let branches = this.props.branches.map((branch, id) =>
+
+    // Reassociate limbs with their branches
+    let branches = [...this.props.branches]
+    branches.forEach(branch => { branch.limbs = [] });
+
+    for (let i = 0; i < this.props.limbs.length; i++) {
+      let l = this.props.limbs[i];
+      for (let j = 0; j < branches.length; j++) {
+        if (l.branch.id === branches[j].id) {
+          branches[j].limbs.push(l)
+        }
+      }
+    }
+    // console.log(this.props.limbs)
+    // console.log(branches)
+
+    branches = branches.map((branch, id) =>
       <Card key={id} className="m-2">
         {branch.cover ? (
-          <div className="branch-img" style={{backgroundImage: 'url(' + branch.cover + ')'}} />
+          <div className="branch-img" style={{ backgroundImage: 'url(' + branch.cover + ')' }} />
         ) : (
-          <FontAwesomeIcon icon={faPagelines} className='default-branch-svg fa-7x' />
-        )}
+            <FontAwesomeIcon icon={faPagelines} className='default-branch-svg fa-7x' />
+          )}
         <Card.Body>
           <Card.Title>{branch.title}</Card.Title>
         </Card.Body>
-        <Card.Body className="">
+        <Card.Body className="py-0">
+          <ListGroup className="list-group-flush">
+            {branch.limbs.map((limb, id) =>
+              <ListGroupItem key={id} className="limb p-0 d-flex justify-content-between align-text-center">
+                {/* <div className=""> */}
+                  {/* <div>{id + 1}</div> */}
+                  <div className="text-left"><a href={limb.song_url}>{limb.artist_name}</a></div>
+                  <div className="text-right"><a target="_blank" rel="noopener noreferrer" href={limb.event_uri}>{limb.venue_name}</a></div>
+                  <button className="btn-delete" onClick={() => {this.props.handleLimbDelete(limb)}}>x</button>
+                {/* </div> */}
+              </ListGroupItem>
+            )}
+          </ListGroup>
+        </Card.Body>
+        <Card.Body>
           <Button>Export</Button>
           <Button onClick={() => this.props.handleBranchDelete(branch)}>Delete</Button>
         </Card.Body>
-        <Card.Body className="">
-        {/* <ListGroup className="list-group-flush">
-          <ListGroupItem>Cras justo odio</ListGroupItem>
-          <ListGroupItem>Dapibus ac facilisis in</ListGroupItem>
-          <ListGroupItem>Vestibulum at eros</ListGroupItem>
-        </ListGroup> */}
 
-        </Card.Body>
       </Card>)
 
     // console.log(this.props.branches)

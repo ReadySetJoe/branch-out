@@ -10,10 +10,11 @@ class LimbSerializer(serializers.ModelSerializer):
     class Meta:
         model = Limb
         depth = 1
-        fields = ['artist_url', 'artist_id', 'artist_name',
-                  'event_id', 'event_name', 'event_city', 'event_date', 'event_uri',
-                  'venue_name', 'venue_id', 'venue_url',
-                  'song_url', 'song_name', 'song_preview_url', ]
+        fields = '__all__'
+        # fields = ['artist_url', 'artist_id', 'artist_name',
+        #           'event_id', 'event_name', 'event_city', 'event_date', 'event_uri',
+        #           'venue_name', 'venue_id', 'venue_url',
+        #           'song_url', 'song_name', 'song_preview_url', ]
 
 
 class BranchSerializer(serializers.ModelSerializer):
@@ -22,8 +23,8 @@ class BranchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Branch
         depth = 1
-        # fields = '__all__'
-        fields = ['id', 'cover', 'title', 'limbs']
+        fields = '__all__'
+        # fields = ['id', 'cover', 'title', 'limbs']
 
     def create(self, validated_data):
         # import pdb

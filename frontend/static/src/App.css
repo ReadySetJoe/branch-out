@@ -61,7 +61,7 @@ body {
 
 .top-bar {
   background-color: #282c34;
-  opacity: 0.6;
+  opacity: 0.9;
   border-bottom: 1px solid #aaa;
 }
 
@@ -76,7 +76,7 @@ body {
 /** Footer **/
 .bottom-bar {
   background-color: #282c34;
-  opacity: 0.6;
+  opacity: 0.9;
   border-top: 1px solid #aaa; 
   font-size: small; 
 }
@@ -155,7 +155,7 @@ section:nth-child(1) {
   border: 0.2em solid #1ecd97;
   color: #1ecd97;
   cursor: pointer;
-  font-size: calc(8px + 1.5vmin);
+  /* font-size: calc(8px + 1.5vmin); */
   padding: 0.7em 1.5em;
   text-transform: uppercase;
   transition: all 0.25s ease;
@@ -182,7 +182,7 @@ section:nth-child(1) {
   border-radius: 2em;
   border: 0.2em solid rgb(139, 139, 139);
   color: rgb(139, 139, 139);
-  font-size: calc(8px + 1.5vmin);
+  /* font-size: calc(8px + 1.5vmin); */
   padding: 0.7em 1.5em;
   text-transform: uppercase;
   transition: all 0.25s ease;
