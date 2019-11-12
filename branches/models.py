@@ -5,6 +5,7 @@ User = get_user_model()
 
 
 class Branch(models.Model):
+    title = models.CharField(default="Untitled Branch", max_length=255)
     cover = models.ImageField(upload_to='images/', null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

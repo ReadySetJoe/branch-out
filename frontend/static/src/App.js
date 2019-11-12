@@ -56,6 +56,7 @@ class App extends React.Component {
 
       // Location
       navigator_has_geolocation: false,
+      geolocation_started: false,
       geolocation_complete: false,
       latitude: 0,
       longitude: 0,
@@ -95,15 +96,14 @@ class App extends React.Component {
     this.selectArtist = this.selectArtist.bind(this);
     this.useMyLocation = this.useMyLocation.bind(this);
     this.findEvents = this.findEvents.bind(this);
-    this.addNowPlayingToList = this.addNowPlayingToList.bind(this);
     this.handleImageChange = this.handleImageChange.bind(this);
+    this.handleChange = this.handleChange.bind(this);
     this.makeLimbs = this.makeLimbs.bind(this);
     this.makeBranch = this.makeBranch.bind(this);
-    this.save = this.save.bind(this);
-    this.load = this.load.bind(this);
     this.handleLimbDelete = this.handleLimbDelete.bind(this);
     this.handleBranchDelete = this.handleBranchDelete.bind(this);
-
+    this.save = this.save.bind(this);
+    this.load = this.load.bind(this);
   }
 
   componentDidMount() {
@@ -146,10 +146,6 @@ class App extends React.Component {
       axios.get(`/api/v1/user-social-auth/`)
         .then(res => {
           console.log('Check for login:', res)
-          // const SOME_EXPIRED_TOKEN_CHECK = false
-          // if (SOME_EXPIRED_TOKEN_CHECK) {
-          //   axios.post(`https://accounts.spotify.com/api/token?grant_type=refresh_token&refresh_token=${res.data[0].extra_data.refresh_token}`)
-          // }
           spotifyApi.setAccessToken(res.data[0].extra_data.access_token)
           this.getNowPlaying()
           this.setState({
@@ -241,31 +237,6 @@ class App extends React.Component {
       })
   }
 
-  addNowPlayingToList() {
-    let formData = new FormData();
-    formData.append('title', this.state.item.name);
-    formData.append('artist', this.state.item.artists[0].name);
-    formData.append('url', this.state.item.href);
-    formData.append('track_number', this.state.songs.length);
-    formData.append('duration_ms', this.state.item.duration_ms);
-    localStorage.setItem('formData', JSON.stringify(formData))
-    localStorage.setItem('state-addnowplaying', JSON.stringify(this.state))
-    console.log(formData)
-
-    axios({
-      method: 'post',
-      url: '/api/v1/songs/',
-      config: { headers: { 'content-type': 'multipart/form-data' } },
-      data: formData,
-    })
-      .then(() => {
-        console.log('Current song added to song list!')
-      })
-      .catch(error => {
-        console.log(error)
-      })
-  }
-
   selectArtist(artist) {
     // Handles selected root artist toggling
     if (!this.state.root_artists_selected.includes(artist)) {
@@ -300,7 +271,7 @@ class App extends React.Component {
         .finally(() => {
           if (i === this.state.root_artists_selected.length - 1) { // last pull
             console.log(`# of artists found: ${this.state.artists_all.length}`)
-            console.log(`# of genres found: ${this.state.genre_set.length}`)
+            console.log('# of genres found: ', this.state.genre_set.size)
             console.log('genres found: ', this.state.genre_set)
           }
         })
@@ -309,6 +280,7 @@ class App extends React.Component {
 
   useMyLocation(e) {
     e.preventDefault()
+    this.setState({geolocation_started: true})
     let self = this;
     navigator.geolocation.getCurrentPosition(
       function success(position) {
@@ -414,7 +386,7 @@ class App extends React.Component {
             spotifyApi.getArtistTopTracks(a.id, "ES")
               // eslint-disable-next-line no-loop-func
               .then(res => {
-                console.log(a, res.tracks[0], b)
+                // console.log(a, res.tracks[0], b)
                 let limbs = [...this.state.limbs]
                 let limb = { artist: a, song: res.tracks[0], event: b }
                 if (!limbs.includes(limb)) {
@@ -433,15 +405,18 @@ class App extends React.Component {
   makeBranch(e) {
     e.preventDefault()
     let branches_user = [...this.state.branches_user]
+    let branch = this.state.branch
+    branch['title'] = this.state.branch_name
     branches_user.push(this.state.branch)
     this.setState({ branches_user: branches_user })
 
     let branch_data = new FormData();
+    branch_data.append('title', this.state.branch_name)
     if (this.state.image) { branch_data.append('cover', this.state.image) }
     let limbs = []
     for (let i = 0; i < this.state.limbs.length; i++) {
       let limb = {
-        artist_url: this.state.limbs[i].artist.external_urls.spotify,
+        artist_url: this.state.limbs[i].artist.uri,
         artist_id: this.state.limbs[i].artist.id,
         artist_name: this.state.limbs[i].artist.name,
         event_id: this.state.limbs[i].event.id,
@@ -452,7 +427,7 @@ class App extends React.Component {
         venue_name: this.state.limbs[i].event.venue.displayName,
         venue_id: this.state.limbs[i].event.venue.id,
         venue_url: this.state.limbs[i].event.venue.uri,
-        song_url: this.state.limbs[i].song.external_urls.spotify,
+        song_url: this.state.limbs[i].song.uri,
         song_name: this.state.limbs[i].song.name,
         song_preview_url: this.state.limbs[i].song.preview_url,
       }
@@ -572,8 +547,8 @@ class App extends React.Component {
     let limbs = this.state.limbs.map((limb, id) =>
       <div key={id} className="limb d-flex align-text-center">
         <div>{id + 1}</div>
-        <div className="col-3 text-left"><a target="_blank" rel="noopener noreferrer" href={limb.artist.external_urls.spotify}>{limb.artist.name}</a></div>
-        <div className="col-3 text-left"><a target="_blank" rel="noopener noreferrer" href={limb.song.external_urls.spotify}>{limb.song.name}</a></div>
+        <div className="col-3 text-left"><a href={limb.artist.uri}>{limb.artist.name}</a></div>
+        <div className="col-3 text-left"><a href={limb.song.uri}>{limb.song.name}</a></div>
         <div className="col-2"><a target="_blank" rel="noopener noreferrer" href={limb.event.venue.uri}>{limb.event.venue.displayName}</a></div>
         <div className="col-1"><a target="_blank" rel="noopener noreferrer" href={limb.event.uri}>get tix</a></div>
         <div className="col-2">{limb.event.location.city.replace(", US", "")}</div>
@@ -611,6 +586,8 @@ class App extends React.Component {
             branches={this.state.branches_user}
             limbs={this.state.limbs_user}
             handleClose={() => this.setState({ show_modal: false })}
+            handleBranchDelete={this.handleBranchDelete}
+            first_name={this.state.first_name}
           />
 
           <h1 className={`${this.state.token ? ('title') : ('title title-login animate fadeInUp one')}`}>branch.out</h1>
@@ -681,8 +658,6 @@ class App extends React.Component {
                 {SPOTIFY_INTERVAL_LIMITER && (<button className='btn p-1 refresh-btn' onClick={() => this.getNowPlaying()}><span className="p-1"><FontAwesomeIcon icon={faSync} /></span></button>)}
               </section>
 
-              {/* <div className="separator"></div> */}
-
               <button className={`btn ${this.state.use_now_playing ? 'btn-selected' : ''} `} onClick={() => this.useNowPlaying()}>Use Artists Related to Now Playing</button>
               <button className={`btn ${this.state.use_top_artists ? 'btn-selected' : ''} `} onClick={() => this.useTopArtists()}>Use Your Top Artists</button>
             </div>
@@ -726,7 +701,8 @@ class App extends React.Component {
                 <h4>Not your location? Click below for a better guess:</h4>
                 {!this.state.geolocation_complete ?
                   (<button className="btn m-auto" onClick={this.useMyLocation}>Find My Location</button>)
-                  : (<button className="btn btn-selected">Found!</button>)}
+                  : (<button className="btn m-auto btn-selected">Found!</button>)}
+                {this.state.geolocation_started && !this.state.geolocation_complete && (<div className="loader"></div>)}
               </div>
               <div className={`location-zip m-4 ${!this.state.navigator_has_geolocation ? 'd-flex' : 'd-none'}`}>
                 <div>We're sorry, your browser doesn't support geolocation :(</div>
@@ -741,10 +717,8 @@ class App extends React.Component {
             <div># of events found: {this.state.events_all.length}</div>
             <div># of performing artists found: {this.state.events_artists.length}</div>
             <div># of related artists found: {this.state.artists_all.length}</div>
-            <div># of genres found: {this.state.genre_set.length}</div>
+            <div># of genres found: {this.state.genre_set.size}</div>
           </div>
-
-          {/* <div className="separator"></div> */}
 
           {this.state.limbs.length > 0 && (
             <section className="animate fadeInUp">

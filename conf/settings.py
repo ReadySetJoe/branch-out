@@ -168,8 +168,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # UPLOADED FILE CONFIGURATION
 #  SEE: https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html#settings
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-# AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
-# AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
+AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
+AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
 AWS_STORAGE_BUCKET_NAME = 'ccs-drf-react-recipes-readysetjoe'
 AWS_DEFAULT_ACL = None
 # # default will be to lock down
@@ -188,8 +188,8 @@ SOCIAL_AUTH_SPOTIFY_SECRET = os.environ['SPOTIFY_AUTH_SECRET']
 SOCIAL_AUTH_POSTGRES_JSONFIELD = True
 SOCIAL_AUTH_SPOTIFY_SCOPE = ["user-read-currently-playing", "user-read-playback-state", "user-read-private", "user-read-email", "user-top-read", 'playlist-modify-public',]
 
-GOOGLE_API_KEY = os.environ['GOOGLE_API_KEY']
-GOOGLE_API_KEY_DEV = os.environ['GOOGLE_API_KEY_DEV']
+# GOOGLE_API_KEY = os.environ['GOOGLE_API_KEY']
+# GOOGLE_API_KEY_DEV = os.environ['GOOGLE_API_KEY_DEV']
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',

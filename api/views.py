@@ -3,6 +3,7 @@ from rest_framework.response import Response
 
 from django.shortcuts import get_object_or_404
 from social_django.models import UserSocialAuth
+from social_django.utils import load_strategy
 
 from .permissions import IsOwnerOrReadOnly
 from .serializers import UserSocialAuthSerializer, LimbSerializer, BranchSerializer
@@ -79,7 +80,10 @@ class UserSocialAuthViewSet(viewsets.ViewSet):
     def user(self, request):
         # import pdb
         # pdb.set_trace()
+
         queryset = UserSocialAuth.objects.filter(user=request.user)
+        queryset[0].refresh_token(load_strategy())
+
         serializer = UserSocialAuthSerializer(queryset, many=True)
         return Response(serializer.data)
 

@@ -1,0 +1,55 @@
+.modal-content {
+  background: #282c34;
+  color: #fff;
+}
+
+.modal-header {
+  border-bottom: 1px solid #aaa;
+}
+
+.modal-footer {
+  border-top: 1px solid #aaa;
+}
+
+.close {
+  float: right;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  text-shadow: 0 1px 0 #000;
+  /* filter: alpha(opacity=20); */
+  /* opacity: .2; */
+}
+
+.card {
+  background: #34383f;
+  opacity: 0.8;
+  width: 360px;
+}
+
+.list-group-item {
+  background: #34383f;
+}
+
+.card-body > .btn {
+  font-size: 12px;
+  padding: 6px 13px;
+}
+
+.default-branch-svg {
+  height: 360px;
+  width: 360px;
+  align-self: center;
+  fill: #fff;
+  /* border: 1px #aaa solid; */
+  /* border-radius: 50%; */
+}
+
+.branch-img {
+  height: 360px;
+  /* width: 240px; */
+  /* object-fit: cover; */
+  background: 50% 50% no-repeat;
+  background-size: cover;
+}

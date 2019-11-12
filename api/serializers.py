@@ -22,7 +22,8 @@ class BranchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Branch
         depth = 1
-        fields = ['cover', 'limbs']
+        # fields = '__all__'
+        fields = ['id', 'cover', 'title', 'limbs']
 
     def create(self, validated_data):
         # import pdb

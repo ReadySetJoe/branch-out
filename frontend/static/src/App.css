@@ -133,6 +133,10 @@ section:nth-child(1) {
   justify-content: center;
 }
 
+.location-geo {
+  position: relative;
+}
+
 /** Branches **/
 .branch-name-input {
   text-align: left;
@@ -302,7 +306,29 @@ section:nth-child(1) {
 .limb > div > a {
   color: white;
 }
+/*=== Animations ===*/
+.loader {
+  border: 10px solid #fff;
+  border-radius: 50%;
+  border-top: 10px solid #3498db;
+  width: 40px;
+  height: 40px;
+  animation: spin 2s linear infinite;
+  position: absolute;
+  top: 73px;
+  right: 60px;
+}
 
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 /* from https://fabriceleven.com/dev/quickly-add-css-fade-in-animations/ */
 /*=== Trigger  ===*/
 .animate {
@@ -314,21 +340,21 @@ section:nth-child(1) {
 
 /*=== Optional Delays, change values here  ===*/
 .one {
-  -webkit-animation-delay: 0.4s;
-  -moz-animation-delay: 0.4s;
-  animation-delay: 0.4s;
+  -webkit-animation-delay: 1s;
+  -moz-animation-delay: 1s;
+  animation-delay: 1s;
   }
   
   .two {
-  -webkit-animation-delay: 1.7s;
-  -moz-animation-delay: 1.7s;
-  animation-delay: 1.7s;
+  -webkit-animation-delay: 2.2s;
+  -moz-animation-delay: 2.2s;
+  animation-delay: 2.2s;
   }
   
   .three {
-  -webkit-animation-delay: 3s;
-  -moz-animation-delay: 3s;
-  animation-delay: 3s;
+  -webkit-animation-delay: 3.5s;
+  -moz-animation-delay: 3.5s;
+  animation-delay: 3.5s;
   }
   
 /*=== Animations start here  ===*/
