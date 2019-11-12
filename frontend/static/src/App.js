@@ -129,7 +129,7 @@ class App extends React.Component {
     this.setState({ navigator_has_geolocation: "geolocation" in navigator })
 
     // Get IP Location (not perfectly accurate but quick and easy)
-    axios.get('http://ip-api.com/json')
+    axios.get('https://ip-api.com/json')
       .then((res) => {
         console.log('IP lookup', res);
         this.setState({
