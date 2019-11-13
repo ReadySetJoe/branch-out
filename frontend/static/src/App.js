@@ -626,12 +626,12 @@ class App extends React.Component {
 
     let limbs = this.state.limbs.map((limb, id) =>
       <div key={id} className="limb d-flex align-text-center">
-        <div className="d-none d-sm-flex">{id + 1}</div>
-        <div className="col-4 col-sm-3 text-left"><a href={limb.artist.uri}>{limb.artist.name}</a></div>
-        <div className="col-sm-3 text-left d-none d-sm-flex"><a href={limb.song.uri}>{limb.song.name}</a></div>
-        <div className="col-6 col-sm-2"><a target="_blank" rel="noopener noreferrer" href={limb.event.venue.uri}>{limb.event.venue.displayName}</a></div>
-        <div className="col-sm-1 d-none d-sm-flex"><a target="_blank" rel="noopener noreferrer" href={limb.event.uri}>get tix</a></div>
-        <div className="col-sm-2 d-none d-sm-flex">{limb.event.location.city.replace(", US", "")}</div>
+        <div className="d-none d-md-flex">{id + 1}</div>
+        <div className="col-4 col-md-3 text-left"><a href={limb.artist.uri}>{limb.artist.name}</a></div>
+        <div className="col-md-3 text-left d-none d-md-flex"><a href={limb.song.uri}>{limb.song.name}</a></div>
+        <div className="col-6 col-md-2"><a target="_blank" rel="noopener noreferrer" href={limb.event.venue.uri}>{limb.event.venue.displayName}</a></div>
+        <div className="col-md-1 d-none d-md-flex"><a target="_blank" rel="noopener noreferrer" href={limb.event.uri}>get tix</a></div>
+        <div className="col-md-2 d-none d-md-flex">{limb.event.location.city.replace(", US", "")}</div>
         <div>{limb.event.start.date.slice(5, limb.event.start.date.length)}</div>
         <button className="btn-delete" onClick={() => this.handleLimbDelete(limb)}>x</button>
       </div>
@@ -640,12 +640,12 @@ class App extends React.Component {
     let limbs_table =
       <div className="limbs">
         <div className="limb font-weight-bolder">
-          <div className="d-none d-sm-flex">#</div>
-          <div className="col-4 col-sm-3 text-left">Artist</div>
-          <div className="col-sm-3 d-none d-sm-flex text-left">Top Song</div>
-          <div className="col-6 col-sm-2">Venue</div>
-          <div className="col-sm-1 d-none d-sm-flex">Tickets</div>
-          <div className="col-sm-2 d-none d-sm-flex">City</div>
+          <div className="d-none d-md-flex">#</div>
+          <div className="col-4 col-md-3 text-left">Artist</div>
+          <div className="col-md-3 d-none d-md-flex text-left">Top Song</div>
+          <div className="col-6 col-md-2">Venue</div>
+          <div className="col-md-1 d-none d-md-flex">Tickets</div>
+          <div className="col-md-2 d-none d-md-flex">City</div>
           <div>Date</div>
         </div>
         {limbs}
