@@ -4,8 +4,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSync } from '@fortawesome/free-solid-svg-icons';
 import { faPagelines, faGithub, faLinkedin, faFontAwesome, faSpotify } from '@fortawesome/free-brands-svg-icons';
 import Alert from 'react-bootstrap/Alert';
-import skBadgePink from './images/sk-badge-pink.svg';
-// import poweredBySongkickPink from './images/powered-by-songkick-pink.svg';
+import skBadgeWhite from './images/sk-badge-white.svg';
+// import poweredBySongkickWhite from './images/powered-by-songkick-White.svg';
 
 import SpotifyWebApi from 'spotify-web-api-js';
 import Player from "./Player";
@@ -671,14 +671,14 @@ class App extends React.Component {
             first_name={this.state.first_name}
           />
 
-          <h1 className={`${this.state.token ? ('title d-none d-md-flex') : ('title title-login animate fadeInUp one')}`}>branch.out</h1>
+          <h1 className={`${this.state.token ? ('title d-none d-md-flex') : ('title title-login m-auto animate fadeInUp one')}`}>branch.out</h1>
           {!this.state.token && (
-            <div className="d-flex flex-column align-items-center animate fadeInUp two">
+            <div className="d-flex flex-column align-items-center m-auto animate fadeInUp two">
               <FontAwesomeIcon className="my-2" icon={faPagelines} />
-              <h3 className="my-2">Welcome to branch.out</h3>
-              <h3 className="my-2">A site that helps people find new music, coming to a stage nearby</h3>
-              <h3 className="my-2">Let's find the the next concert you will never forget</h3>
-              <FontAwesomeIcon className="my-2" icon={faPagelines} />
+              <h3 className="welcome-line my-2">Welcome to branch.out</h3>
+              <h3 className="welcome-line my-2">A site that helps people find new music, coming to a stage nearby</h3>
+              <h3 className="welcome-line my-2">Let's find the the next concert you will never forget</h3>
+              <FontAwesomeIcon className="welcome-line my-2" icon={faPagelines} />
               <a className="btn btn-login animate fadeInUp three my-3" href="/social/login/spotify/">Login to Spotify</a>
             </div>
           )}
@@ -718,7 +718,7 @@ class App extends React.Component {
                 {SPOTIFY_INTERVAL_LIMITER && (<button className='btn p-1 refresh-btn' onClick={() => this.getNowPlaying()}><span className="p-1"><FontAwesomeIcon icon={faSync} /></span></button>)}
               </section>
 
-              <button className={`btn ${this.state.use_now_playing ? 'btn-selected' : ''} `} onClick={() => this.useNowPlaying()}>Use Artists Related to Now Playing</button>
+              <button className={`btn ${this.state.use_now_playing ? 'btn-selected' : ''} `} onClick={() => this.useNowPlaying()}>Use Related Artists</button>
               <button className={`btn ${this.state.use_top_artists ? 'btn-selected' : ''} `} onClick={() => this.useTopArtists()}>Use Your Top Artists</button>
             </div>
           )}
@@ -840,7 +840,7 @@ class App extends React.Component {
           <footer className="bottom-bar fixed-bottom d-flex align-items-center justify-content-between p-2">
             <div className="ccs-thank-you mr-5 text-left d-md-inline d-none">Created at <a href="https://carolinacodeschool.org/">Carolina Code School</a><br />Presented Nov, 15th 2019</div>
 
-            <div className="created-by col-12 col-sm">branch.out was made by Joe Powers, more of my stuff here:
+            <div className="created-by col-12 col-sm">branch.out was made by Joe Powers:
               <a className="mx-1" href="https://github.com/ReadySetJoe"><FontAwesomeIcon icon={faGithub} /></a>
               <a className="mx-1" href="https://www.linkedin.com/in/joe-powers/"><FontAwesomeIcon icon={faLinkedin} /></a>
             </div>
@@ -849,7 +849,7 @@ class App extends React.Component {
               <span>API:</span>
               <div className="citations-api text-left mx-2">
                 <div className="citation-spotify"><a href="https://developer.spotify.com/">Spotify <FontAwesomeIcon icon={faSpotify} /></a></div>
-                <div className="citation-songkick"><a href="https://www.songkick.com/developer">Songkick <img className="songkick-badge-img" alt="songkick badge" src={skBadgePink} /></a></div>
+                <div className="citation-songkick"><a href="https://www.songkick.com/developer">Songkick <img className="songkick-badge-img" alt="songkick badge" src={skBadgeWhite} /></a></div>
               </div>
               Style:
               <div className="citations-style text-left mx-2">
