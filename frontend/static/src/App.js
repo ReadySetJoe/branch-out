@@ -5,7 +5,7 @@ import { faSync } from '@fortawesome/free-solid-svg-icons';
 import { faPagelines, faGithub, faLinkedin, faFontAwesome, faSpotify } from '@fortawesome/free-brands-svg-icons';
 import Alert from 'react-bootstrap/Alert';
 import skBadgePink from './images/sk-badge-pink.svg';
-import poweredBySongkickPink from './images/powered-by-songkick-pink.svg';
+// import poweredBySongkickPink from './images/powered-by-songkick-pink.svg';
 
 import SpotifyWebApi from 'spotify-web-api-js';
 import Player from "./Player";
@@ -626,12 +626,12 @@ class App extends React.Component {
 
     let limbs = this.state.limbs.map((limb, id) =>
       <div key={id} className="limb d-flex align-text-center">
-        <div>{id + 1}</div>
-        <div className="col-3 text-left"><a href={limb.artist.uri}>{limb.artist.name}</a></div>
-        <div className="col-3 text-left"><a href={limb.song.uri}>{limb.song.name}</a></div>
-        <div className="col-2"><a target="_blank" rel="noopener noreferrer" href={limb.event.venue.uri}>{limb.event.venue.displayName}</a></div>
-        <div className="col-1"><a target="_blank" rel="noopener noreferrer" href={limb.event.uri}>get tix</a></div>
-        <div className="col-2">{limb.event.location.city.replace(", US", "")}</div>
+        <div className="d-none d-sm-flex">{id + 1}</div>
+        <div className="col-4 col-sm-3 text-left"><a href={limb.artist.uri}>{limb.artist.name}</a></div>
+        <div className="col-sm-3 text-left d-none d-sm-flex"><a href={limb.song.uri}>{limb.song.name}</a></div>
+        <div className="col-6 col-sm-2"><a target="_blank" rel="noopener noreferrer" href={limb.event.venue.uri}>{limb.event.venue.displayName}</a></div>
+        <div className="col-sm-1 d-none d-sm-flex"><a target="_blank" rel="noopener noreferrer" href={limb.event.uri}>get tix</a></div>
+        <div className="col-sm-2 d-none d-sm-flex">{limb.event.location.city.replace(", US", "")}</div>
         <div>{limb.event.start.date.slice(5, limb.event.start.date.length)}</div>
         <button className="btn-delete" onClick={() => this.handleLimbDelete(limb)}>x</button>
       </div>
@@ -640,12 +640,12 @@ class App extends React.Component {
     let limbs_table =
       <div className="limbs">
         <div className="limb font-weight-bolder">
-          <div>#</div>
-          <div className="col-3 text-left">Artist</div>
-          <div className="col-3 text-left">Top Song</div>
-          <div className="col-2">Venue</div>
-          <div className="col-1">Tickets</div>
-          <div className="col-2">City</div>
+          <div className="d-none d-sm-flex">#</div>
+          <div className="col-4 col-sm-3 text-left">Artist</div>
+          <div className="col-sm-3 d-none d-sm-flex text-left">Top Song</div>
+          <div className="col-6 col-sm-2">Venue</div>
+          <div className="col-sm-1 d-none d-sm-flex">Tickets</div>
+          <div className="col-sm-2 d-none d-sm-flex">City</div>
           <div>Date</div>
         </div>
         {limbs}
@@ -671,7 +671,7 @@ class App extends React.Component {
             first_name={this.state.first_name}
           />
 
-          <h1 className={`${this.state.token ? ('title') : ('title title-login animate fadeInUp one')}`}>branch.out</h1>
+          <h1 className={`${this.state.token ? ('title d-none d-md-flex') : ('title title-login animate fadeInUp one')}`}>branch.out</h1>
           {!this.state.token && (
             <div className="d-flex flex-column align-items-center animate fadeInUp two">
               <FontAwesomeIcon className="my-2" icon={faPagelines} />
@@ -700,27 +700,6 @@ class App extends React.Component {
             </div>
           )}
 
-          <footer className="bottom-bar fixed-bottom d-flex align-items-center justify-content-between p-2">
-            <div className="ccs-thank-you mr-5 text-left">Created at <a href="https://carolinacodeschool.org/">Carolina Code School</a><br />Presented Nov, 15th 2019</div>
-            <div className="created-by">branch.out was made by Joe Powers, more of my stuff here:
-              <a className="mx-1" href="https://github.com/ReadySetJoe"><FontAwesomeIcon icon={faGithub} /></a>
-              <a className="mx-1" href="https://www.linkedin.com/in/joe-powers/"><FontAwesomeIcon icon={faLinkedin} /></a>
-            </div>
-            <div className="citations ml-5 d-flex flex-row align-items-center">
-              <span>API:</span>
-              <div className="citations-api text-left mx-2">
-                <div className="citation-spotify"><a href="https://developer.spotify.com/">Spotify <FontAwesomeIcon icon={faSpotify} /></a></div>
-                <div className="citation-songkick"><a href="https://www.songkick.com/developer">Songkick <img className="songkick-badge-img" alt="songkick badge" src={skBadgePink} /></a></div>
-              </div>
-              Style:
-              <div className="citations-style text-left mx-2">
-                <div className="citation-fontawesome"><a href="https://fontawesome.com/">Font Awesome <FontAwesomeIcon icon={faFontAwesome} /></a></div>
-                <div className="citation-style"><a href="https://github.com/JoeKarlsson/react-spotify-player">Joe Karlssons <FontAwesomeIcon icon={faGithub} /></a></div>
-              </div>
-            </div>
-
-          </footer>
-
           {this.state.token && (
             <div className="w-100">
               <section className='player-wrapper justify-content-center'>
@@ -747,7 +726,7 @@ class App extends React.Component {
 
           <section className={`${this.state.use_now_playing || this.state.use_top_artists ? 'animate fadeInRight d-flex flex-column align-items-center' : 'd-none'} `}>
             <h2 className="animate fade-in-right my-4 align-self-baseline ">Please select at least 3 root artists to continue:</h2>
-            <div className="d-flex align-items-center">
+            <div className="d-sm-flex d-inline align-items-center">
               <div>
                 <button className='btn' onClick={() => this.setState({ root_artists_selected: this.state.root_artists })}>All</button>
                 <button className='btn' onClick={() => this.setState({ root_artists_selected: [] })}>None</button>
@@ -818,7 +797,7 @@ class App extends React.Component {
           {this.state.limbs.length > 0 && (
             <section className="animate fadeInUp">
               <header>
-                <form onSubmit={this.makeBranch} className="new-branch-form m-2 d-flex flex-row align-items-center justify-content-around">
+                <form onSubmit={this.makeBranch} className="new-branch-form m-2 d-block d-flex-sm flex-row align-items-center justify-content-around">
                   <button type='button' icon="file" onClick={() => this.myRef.current.click()} className="btn branch-img-preview-btn">
                     {this.state.image ? (
                       <img className="branch-img-preview" src={this.state.preview} alt='branch cover preview' width="200" />
@@ -851,6 +830,29 @@ class App extends React.Component {
               <h4># of related artists found: {this.state.artists_all.length}</h4>
               <h4># of genres found: {this.state.genre_set.size}</h4>
             </section>)}
+
+            <footer className="bottom-bar fixed-bottom d-flex align-items-center justify-content-between p-2">
+            <div className="ccs-thank-you mr-5 text-left d-md-inline d-none">Created at <a href="https://carolinacodeschool.org/">Carolina Code School</a><br />Presented Nov, 15th 2019</div>
+            
+            <div className="created-by col-12 col-sm">branch.out was made by Joe Powers, more of my stuff here:
+              <a className="mx-1" href="https://github.com/ReadySetJoe"><FontAwesomeIcon icon={faGithub} /></a>
+              <a className="mx-1" href="https://www.linkedin.com/in/joe-powers/"><FontAwesomeIcon icon={faLinkedin} /></a>
+            </div>
+            
+            <div className="citations ml-5 d-sm-flex d-none flex-row align-items-center">
+              <span>API:</span>
+              <div className="citations-api text-left mx-2">
+                <div className="citation-spotify"><a href="https://developer.spotify.com/">Spotify <FontAwesomeIcon icon={faSpotify} /></a></div>
+                <div className="citation-songkick"><a href="https://www.songkick.com/developer">Songkick <img className="songkick-badge-img" alt="songkick badge" src={skBadgePink} /></a></div>
+              </div>
+              Style:
+              <div className="citations-style text-left mx-2">
+                <div className="citation-fontawesome"><a href="https://fontawesome.com/">Font Awesome <FontAwesomeIcon icon={faFontAwesome} /></a></div>
+                <div className="citation-style"><a href="https://github.com/JoeKarlsson/react-spotify-player">Joe Karlssons <FontAwesomeIcon icon={faGithub} /></a></div>
+              </div>
+            </div>
+
+          </footer>
         </header>
       </div >
     );
