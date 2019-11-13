@@ -23,7 +23,8 @@ const SK_AUTH_KEY = 'io09K9l3ebJxmxe2'
 
 // Debug Variables
 const API_LIMITER = false; // API Limiter (debug boolean ensuring limited API calling) 
-const SAVE_TO_LOCAL_STORAGE = true;
+const SAVE_TO_LOCAL_STORAGE = false;
+const HEROKU_IP_DISABLE = true;
 
 class App extends React.Component {
   constructor(props) {
@@ -64,7 +65,6 @@ class App extends React.Component {
       city: '',
       region: '',
       country_code: '',
-      ip_error: false,
 
       // Artists
       artists_all: [],
@@ -133,20 +133,24 @@ class App extends React.Component {
     // Check for Geolocation in Navigator
     this.setState({ navigator_has_geolocation: "geolocation" in navigator })
 
-    // Get IP Location (not perfectly accurate but quick and easy)
-    axios.get('http://ip-api.com/json')
-      .then((res) => {
-        console.log('IP lookup', res);
-        this.setState({
-          latitude: res.data.lat,
-          longitude: res.data.lon,
-          city: res.data.city,
-          region: res.data.region,
-          country_code: res.data.countryCode,
+    if (!HEROKU_IP_DISABLE) {
+      // Get IP Location (not perfectly accurate but quick and easy)
+      axios.get('http://ip-api.com/json')
+        .then((res) => {
+          console.log('IP lookup', res);
+          this.setState({
+            latitude: res.data.lat,
+            longitude: res.data.lon,
+            city: res.data.city,
+            region: res.data.region,
+            country_code: res.data.countryCode,
+          })
+          this.findEvents()
         })
-        this.findEvents()
-      })
-      .catch((err) => { console.log(err); this.setState({ ip_error: true }) })
+        .catch(err => console.log(err))
+
+    }
+
 
     // Reloads user, based on token stored in state
     if (!this.state.token) {
@@ -502,7 +506,7 @@ class App extends React.Component {
         this.setState({
           branches_user: branches_user,
           playlist_id: res.id,
-          playlist_uri: res.uri, 
+          playlist_uri: res.uri,
         })
 
         let branch_data = new FormData();
@@ -769,17 +773,18 @@ class App extends React.Component {
 
           {this.state.root_artists_selection_complete && (
             <section className='location d-flex justify-content-center animate fadeInLeft'>
-              {this.state.ip_error ?
-                (<div>IP Address Not Found</div>)
-                :
-                (<div className={`location-ip p-3 m-4 ${this.state.city !== '' ? ('') : ('d-none')}`}>
-                  <h3 className="">Based on your IP address, your location is:</h3>
-                  <h2><i>{`${this.state.city}, ${this.state.region}, ${this.state.country_code}`}</i></h2>
-                </div>)}
+              {!HEROKU_IP_DISABLE && (<div className={`location-ip p-3 m-4 ${this.state.city !== '' ? ('') : ('d-none')}`}>
+                <h3 className="">Based on your IP address, your location is:</h3>
+                <h2><i>{`${this.state.city}, ${this.state.region}, ${this.state.country_code}`}</i></h2>
+              </div>)}
 
 
               <div className={`location-geo m-4 ${this.state.navigator_has_geolocation ? 'd-flex flex-column' : 'd-none'}`}>
-                <h4>Not your location? Click below for a better guess:</h4>
+                {HEROKU_IP_DISABLE ? (
+                  <h4 className="m-4">Let's figure out where to search for concerts! Click the button below:</h4>
+                ) : (
+                    <h4>Not your location? Click below for a better guess:</h4>
+                  )}
                 {!this.state.geolocation_complete ?
                   (<button className="btn m-auto find-location-btn" onClick={this.useMyLocation}>Find My Location
                   {this.state.geolocation_started && !this.state.geolocation_complete && (<div className="loader"></div>)}</button>)
@@ -847,7 +852,7 @@ class App extends React.Component {
               <h4># of genres found: {this.state.genre_set.size}</h4>
             </section>)}
         </header>
-      </div>
+      </div >
     );
   }
 }
