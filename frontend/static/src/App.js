@@ -678,7 +678,7 @@ class App extends React.Component {
               <h3 className="welcome-line my-2">Welcome to branch.out</h3>
               <h3 className="welcome-line my-2">A site that helps people find new music, coming to a stage nearby</h3>
               <h3 className="welcome-line my-2">Let's find the the next concert you will never forget</h3>
-              <FontAwesomeIcon className="welcome-line my-2" icon={faPagelines} />
+              <FontAwesomeIcon className="my-2" icon={faPagelines} />
               <a className="btn btn-login animate fadeInUp three my-3" href="/social/login/spotify/">Login to Spotify</a>
             </div>
           )}

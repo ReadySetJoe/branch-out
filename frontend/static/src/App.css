@@ -52,7 +52,7 @@ body {
 }
 
 .title-login {
-  font-size: 9vw;
+  font-size: 11vh;
   position: static;
   display: flex;
   flex-flow: column;
@@ -60,7 +60,7 @@ body {
 }
 
 .welcome-line {
-  font-size: 2.5vw;
+  font-size: 4vh;
 }
 
 .top-bar {
