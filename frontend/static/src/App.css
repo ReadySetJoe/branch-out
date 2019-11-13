@@ -143,6 +143,10 @@ section:nth-child(1) {
   padding: 10px;
 }
 
+.venue-wrap {
+  text-overflow: ellipsis;
+}
+
 /** Buttons **/
 
 .btn {
@@ -274,7 +278,7 @@ section:nth-child(1) {
 /** Limbs **/
 .limb {
   border-top: 1px solid #aaa;
-  height: 42px;
+  height: 48px;
   display: flex;
   align-items: center;
   position: relative;

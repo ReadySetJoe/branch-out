@@ -116,7 +116,7 @@ class App extends React.Component {
   componentDidMount() {
     // Generates random branch name
     const NAME_ADJ = ['accessible', 'accomplished', 'ambitious', 'assured', 'bangin', 'beautiful', 'blissful', 'bold', 'breathtaking', 'brilliant', 'catchy', 'cerebral', 'classic', 'clean', 'clever', 'cleverly-written', 'cohesive', 'complex', 'conceptual', 'danceable', 'definitive', 'deftly-produced', 'delightful', 'dynamic', 'ebullient', 'eclectic', 'ecstatic', 'effortless', 'emotionally-rich', 'endlessly-playable', 'enigmatic', 'enterntaining', 'epic', 'ethereal', 'exceptional', 'exhilarating', 'expansive', 'notable', 'nuanced', 'number', 'operatic', 'passionate', 'percussion-saoked', 'perfect', 'piercing', 'playful', 'poetic', 'poignant', 'polished', 'primal', 'progressive', 'radical', 'raw', 'refined', 'refrain', 'relentless', 'reliably-solid', 'reverbed', 'rhythimic', 'riotous', 'riveting', 'rollicking', 'satisfying', 'saturated', 'sculptural', 'seductive', 'sensitive', 'skilled', 'skillful', 'soaring', 'solid', 'sombre', 'sonic', 'sophisticated', 'feel-good', 'finely-calibrated', 'flawless', 'fluid', 'focused', 'fresh', 'funky', 'grandiose', 'groundbreaking', 'harmonic', 'harmonically-rich', 'headbanging', 'heartfelt', 'hi-fi', 'highly-listenable', 'highly-recommended', 'hypnotic', 'indulgent', 'innocent', 'instrospective', 'instrumental', 'intoxicating', 'inventice', 'invigorating', 'inviting', 'latest', 'layered', 'limitless', 'listenable', 'lush', 'lyrical', 'masterful', 'mesmerizing', 'midtempo', 'moody', 'musical', 'mythical', 'sprawling', 'staccato', 'stratospheric', 'strident', 'striking', 'studied', 'stunning', 'stylish', 'stylistic', 'sublime', 'successful', 'surprising', 'symphonic', 'synthetic', 'talented', 'tender', 'textured', 'thrilling', 'throbbing', 'thunderous', 'tight', 'timeless', 'top-flight', 'trademark', 'trailblazing', 'transcendent', 'transporting', 'unexpected', 'unfied', 'unique', 'unpredictable', 'unsung', 'upbeat', 'visionary', 'vocal', 'well-rounded', 'well-tooled',]
-    const NAME_NOUN = ['Alder', 'Apple', 'Ash', 'Aspen', 'Basswood', 'Birch', 'Buckeye', 'Buckthorn', 'California-laurel', 'Catalpa', 'Cedar', 'Cherry', 'Chestnut', 'Chinkapin', 'Cottonwood', 'Cypress', 'Dogwood', 'Douglas-fir', 'Elm', 'Filbert', 'Fir', 'Giant', 'Hawthorn', 'Hazel', 'Hemlock', 'Holly', 'Honeylocust', 'Horsechestnut', 'Incense-cedar', 'Juniper', 'Larch', 'Locust', 'Madrone', 'Maple', 'Mountain-ash', 'Mountain-mahogany', 'Oak', 'Oregon-myrtle', 'Pear', 'Pine', 'Plum', 'Poplar', 'Redcedar/Arborvitae', 'Redwood', 'Russian-olive', 'Spruce', 'Sweetgum', 'Sycamore', 'Tanoak', 'Walnut', 'White-cedar', 'Willow', 'Yellow-poplar', 'Yew',]
+    const NAME_NOUN = ['Alder', 'Apple', 'Ash', 'Aspen', 'Basswood', 'Birch', 'Buckeye', 'Buckthorn', 'California-laurel', 'Catalpa', 'Cedar', 'Cherry', 'Chestnut', 'Chinkapin', 'Cottonwood', 'Cypress', 'Dogwood', 'Douglas-fir', 'Elm', 'Filbert', 'Fir', 'Giant', 'Hawthorn', 'Hazel', 'Hemlock', 'Holly', 'Honeylocust', 'Horsechestnut', 'Incense-cedar', 'Juniper', 'Larch', 'Locust', 'Madrone', 'Maple', 'Mountain-ash', 'Mountain-mahogany', 'Oak', 'Oregon-myrtle', 'Pear', 'Pine', 'Plum', 'Poplar', 'Redcedar', 'Arborvitae', 'Redwood', 'Russian-olive', 'Spruce', 'Sweetgum', 'Sycamore', 'Tanoak', 'Walnut', 'White-cedar', 'Willow', 'Yellow-poplar', 'Yew',]
 
     const BRANCH_ADJ_1 = NAME_ADJ[Math.floor(Math.random() * NAME_ADJ.length)];
     const BRANCH_ADJ_2 = NAME_ADJ[Math.floor(Math.random() * NAME_ADJ.length)];
@@ -627,11 +627,11 @@ class App extends React.Component {
     let limbs = this.state.limbs.map((limb, id) =>
       <div key={id} className="limb d-flex align-text-center">
         <div className="d-none d-md-flex">{id + 1}</div>
-        <div className="col-4 col-md-3 text-left"><a href={limb.artist.uri}>{limb.artist.name}</a></div>
-        <div className="col-md-3 text-left d-none d-md-flex"><a href={limb.song.uri}>{limb.song.name}</a></div>
-        <div className="col-6 col-md-2"><a target="_blank" rel="noopener noreferrer" href={limb.event.venue.uri}>{limb.event.venue.displayName}</a></div>
-        <div className="col-md-1 d-none d-md-flex"><a target="_blank" rel="noopener noreferrer" href={limb.event.uri}>get tix</a></div>
-        <div className="col-md-2 d-none d-md-flex">{limb.event.location.city.replace(", US", "")}</div>
+        <div className="col-4 col-lg-3 text-left"><a href={limb.artist.uri}>{limb.artist.name}</a></div>
+        <div className="col-lg-3 text-left d-none d-lg-flex"><a href={limb.song.uri}>{limb.song.name}</a></div>
+        <div className="col-6 col-lg-2 venue-wrap"><a target="_blank" rel="noopener noreferrer" href={limb.event.venue.uri}>{limb.event.venue.displayName}</a></div>
+        <div className="col-lg-1 d-none d-lg-flex"><a target="_blank" rel="noopener noreferrer" href={limb.event.uri}>get tix</a></div>
+        <div className="col-lg-2 d-none d-lg-flex">{limb.event.location.city.replace(", US", "")}</div>
         <div>{limb.event.start.date.slice(5, limb.event.start.date.length)}</div>
         <button className="btn-delete" onClick={() => this.handleLimbDelete(limb)}>x</button>
       </div>
@@ -641,11 +641,11 @@ class App extends React.Component {
       <div className="limbs">
         <div className="limb font-weight-bolder">
           <div className="d-none d-md-flex">#</div>
-          <div className="col-4 col-md-3 text-left">Artist</div>
-          <div className="col-md-3 d-none d-md-flex text-left">Top Song</div>
-          <div className="col-6 col-md-2">Venue</div>
-          <div className="col-md-1 d-none d-md-flex">Tickets</div>
-          <div className="col-md-2 d-none d-md-flex">City</div>
+          <div className="col-4 col-lg-3 text-left">Artist</div>
+          <div className="col-lg-3 d-none d-lg-flex text-left">Top Song</div>
+          <div className="col-6 col-lg-2">Venue</div>
+          <div className="col-lg-1 d-none d-lg-flex">Tickets</div>
+          <div className="col-lg-2 d-none d-lg-flex">City</div>
           <div>Date</div>
         </div>
         {limbs}
@@ -797,7 +797,7 @@ class App extends React.Component {
           {this.state.limbs.length > 0 && (
             <section className="animate fadeInUp">
               <header>
-                <form onSubmit={this.makeBranch} className="new-branch-form m-2 d-block d-flex-sm flex-row align-items-center justify-content-around">
+                <form onSubmit={this.makeBranch} className="new-branch-form m-2 d-flex flex-column flex-lg-row align-items-center justify-content-around">
                   <button type='button' icon="file" onClick={() => this.myRef.current.click()} className="btn branch-img-preview-btn">
                     {this.state.image ? (
                       <img className="branch-img-preview" src={this.state.preview} alt='branch cover preview' width="200" />
@@ -825,20 +825,26 @@ class App extends React.Component {
                 </form>
               </header>
               {limbs_table}
-              <h4># of events found: {this.state.events_all.length}</h4>
-              <h4># of performing artists found: {this.state.events_artists.length}</h4>
-              <h4># of related artists found: {this.state.artists_all.length}</h4>
-              <h4># of genres found: {this.state.genre_set.size}</h4>
+              {/* <h5 className="text-left">Some stats for this branch...</h5>
+              <div className="d-flex">                
+                <div className="d-flex flex-column text-left">
+                  <h5># of events found: {this.state.events_all.length}</h5>
+                  <h5># of performing artists found: {this.state.events_artists.length}</h5>
+                  <h5># of related artists found: {this.state.artists_all.length}</h5>
+                  <h5># of genres found: {this.state.genre_set.size}</h5>
+                </div>
+
+              </div> */}
             </section>)}
 
-            <footer className="bottom-bar fixed-bottom d-flex align-items-center justify-content-between p-2">
+          <footer className="bottom-bar fixed-bottom d-flex align-items-center justify-content-between p-2">
             <div className="ccs-thank-you mr-5 text-left d-md-inline d-none">Created at <a href="https://carolinacodeschool.org/">Carolina Code School</a><br />Presented Nov, 15th 2019</div>
-            
+
             <div className="created-by col-12 col-sm">branch.out was made by Joe Powers, more of my stuff here:
               <a className="mx-1" href="https://github.com/ReadySetJoe"><FontAwesomeIcon icon={faGithub} /></a>
               <a className="mx-1" href="https://www.linkedin.com/in/joe-powers/"><FontAwesomeIcon icon={faLinkedin} /></a>
             </div>
-            
+
             <div className="citations ml-5 d-sm-flex d-none flex-row align-items-center">
               <span>API:</span>
               <div className="citations-api text-left mx-2">
