@@ -184,34 +184,33 @@ class App extends React.Component {
   }
 
   getNowPlaying() {
-    if (this.state.token) {
-      spotifyApi.getMyCurrentPlaybackState()
-        .then(data => {
-          if (data) {
-            this.setState({
-              item: data.item,
-              is_playing: data.is_playing,
-              progress_ms: data.progress_ms,
-            });
-          }
-        })
-        .catch(error => {
-          console.log(error)
+    spotifyApi.getMyCurrentPlaybackState()
+      .then(data => {
+        if (data) {
           this.setState({
-            item: {
-              album: {
-                images: [{ url: "" }]
-              },
-              name: "",
-              artists: [{ name: "", id: "" }],
-              duration_ms: 0,
-            },
-            is_playing: "Spotify Not Currently in use",
-            progress_ms: 0,
+            item: data.item,
+            is_playing: data.is_playing,
+            progress_ms: data.progress_ms,
           });
-        })
+        }
+      })
+      .catch(error => {
+        console.log(error)
+        this.setState({
+          item: {
+            album: {
+              images: [{ url: "" }]
+            },
+            name: "",
+            artists: [{ name: "", id: "" }],
+            duration_ms: 0,
+          },
+          is_playing: "Spotify Not Currently in use",
+          progress_ms: 0,
+        });
+      })
 
-    }
+
   }
 
   useNowPlaying() {

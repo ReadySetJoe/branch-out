@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/static/css/main.1a1ade31.chunk.css",
-    "main.js": "/static/js/main.0c49d4ed.chunk.js",
-    "main.js.map": "/static/js/main.0c49d4ed.chunk.js.map",
+    "main.js": "/static/js/main.bda83b49.chunk.js",
+    "main.js.map": "/static/js/main.bda83b49.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.107b9db7.js",
     "runtime-main.js.map": "/static/js/runtime-main.107b9db7.js.map",
     "static/js/2.e650ac05.chunk.js": "/static/js/2.e650ac05.chunk.js",
     "static/js/2.e650ac05.chunk.js.map": "/static/js/2.e650ac05.chunk.js.map",
     "index.html": "/index.html",
-    "precache-manifest.2cca199a640b6bb92afbda42a2396142.js": "/precache-manifest.2cca199a640b6bb92afbda42a2396142.js",
+    "precache-manifest.9bfab60c56f0a3c59d977837886005d5.js": "/precache-manifest.9bfab60c56f0a3c59d977837886005d5.js",
     "service-worker.js": "/service-worker.js",
     "static/css/main.1a1ade31.chunk.css.map": "/static/css/main.1a1ade31.chunk.css.map",
     "static/media/sk-badge-white.svg": "/static/media/sk-badge-white.bab28695.svg"
@@ -17,6 +17,6 @@
     "static/js/runtime-main.107b9db7.js",
     "static/js/2.e650ac05.chunk.js",
     "static/css/main.1a1ade31.chunk.css",
-    "static/js/main.0c49d4ed.chunk.js"
+    "static/js/main.bda83b49.chunk.js"
   ]
 }
