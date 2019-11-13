@@ -38,18 +38,22 @@ class UserModal extends React.Component {
             <FontAwesomeIcon icon={faPagelines} className='default-branch-svg fa-7x' />
           )}
         <Card.Body>
-          <Card.Title><h2>{branch.title}</h2></Card.Title>
+          <Card.Title><h3 className="m-0">{branch.title}</h3></Card.Title>
         </Card.Body>
         <Card.Body className="py-0">
           <ListGroup className="list-group-flush">
-            {branch.limbs.length === 0 ? (<h4>No branch limbs found :( Either this branch has no limbs, and can be deleted, or try reloading the page to see the newest entries!</h4>) : (
+            <ListGroupItem className="limb p-0 d-flex justify-content-between">
+              <div className="text-left font-weight-bolder">Artist</div>
+              <div className="text-right font-weight-bolder">Venue/Tickets</div>
+            </ListGroupItem>
+            {branch.limbs.length === 0 ? (<h5>No branch limbs found :( Either this branch has no limbs, and can be deleted, or try reloading the page to see the newest entries!</h5>) : (
               branch.limbs.map((limb, id) =>
                 <ListGroupItem key={id} className="limb p-0 d-flex justify-content-between align-text-center">
                   {/* <div className=""> */}
                   {/* <div>{id + 1}</div> */}
                   <div className="text-left"><a href={limb.song_url}>{limb.artist_name}</a></div>
                   <div className="text-right"><a target="_blank" rel="noopener noreferrer" href={limb.event_uri}>{limb.venue_name}</a></div>
-                  <button className="btn-delete" onClick={() => {this.props.handleLimbDelete(limb);}}>x</button>
+                  <button className="btn-delete" onClick={() => { this.props.handleLimbDelete(limb); }}>x</button>
                   {/* </div> */}
                 </ListGroupItem>
               )
@@ -57,7 +61,7 @@ class UserModal extends React.Component {
           </ListGroup>
         </Card.Body>
         {/* <Card.Body> */}
-          <Button onClick={() => this.props.handleBranchDelete(branch)}>Delete Branch</Button>
+        <Button className="mt-0 mb-2 mx-auto" onClick={() => this.props.handleBranchDelete(branch)}>Delete Branch</Button>
         {/* </Card.Body> */}
 
       </Card>)
@@ -69,7 +73,7 @@ class UserModal extends React.Component {
           <Modal.Title>{`${this.props.first_name}'s`} Branches</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <div className="d-flex flex-wrap">
+          <div className="d-flex flex-wrap align-items-baseline justify-content-around">
             {(branches.length !== 0) ? (branches) : <h3>No branches found!</h3>}
           </div>
         </Modal.Body>
