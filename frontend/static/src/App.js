@@ -16,7 +16,7 @@ axios.defaults.xsrfCookieName = 'csrftoken';
 axios.defaults.xsrfHeaderName = 'X-CSRFToken';
 
 const spotifyApi = new SpotifyWebApi();
-const SPOTIFY_API_INTERVAL_SECS = 1;
+const SPOTIFY_API_INTERVAL_SECS = 3;
 const SPOTIFY_INTERVAL_LIMITER = true;
 
 const SK_AUTH_KEY = 'io09K9l3ebJxmxe2'
@@ -184,31 +184,34 @@ class App extends React.Component {
   }
 
   getNowPlaying() {
-    spotifyApi.getMyCurrentPlaybackState()
-      .then(data => {
-        if (data) {
+    if (this.state.token) {
+      spotifyApi.getMyCurrentPlaybackState()
+        .then(data => {
+          if (data) {
+            this.setState({
+              item: data.item,
+              is_playing: data.is_playing,
+              progress_ms: data.progress_ms,
+            });
+          }
+        })
+        .catch(error => {
+          console.log(error)
           this.setState({
-            item: data.item,
-            is_playing: data.is_playing,
-            progress_ms: data.progress_ms,
-          });
-        }
-      })
-      .catch(error => {
-        console.log(error)
-        this.setState({
-          item: {
-            album: {
-              images: [{ url: "" }]
+            item: {
+              album: {
+                images: [{ url: "" }]
+              },
+              name: "",
+              artists: [{ name: "", id: "" }],
+              duration_ms: 0,
             },
-            name: "",
-            artists: [{ name: "", id: "" }],
-            duration_ms: 0,
-          },
-          is_playing: "Spotify Not Currently in use",
-          progress_ms: 0,
-        });
-      })
+            is_playing: "Spotify Not Currently in use",
+            progress_ms: 0,
+          });
+        })
+
+    }
   }
 
   useNowPlaying() {
@@ -671,12 +674,12 @@ class App extends React.Component {
             first_name={this.state.first_name}
           />
 
-          <h1 className={`${this.state.token ? ('title d-none d-md-flex') : ('title title-login m-auto animate fadeInUp one')}`}>branch.out</h1>
+          <h1 className={`${this.state.token ? ('title d-none d-md-flex animate-md fadeOutLeftMD') : ('title title-login m-auto animate fadeInUp one')}`}>branch.out</h1>
           {!this.state.token && (
             <div className="d-flex flex-column align-items-center m-auto animate fadeInUp two">
               <FontAwesomeIcon className="my-2" icon={faPagelines} />
               <h3 className="welcome-line m-2">Welcome to branch.out</h3>
-              <h3 className="welcome-line m-2">A site that helps people find new music, coming to a stage nearby</h3>
+              <h3 className="welcome-line m-2">A site that helps people find new music, coming to a nearby stage</h3>
               <h3 className="welcome-line m-2">Let's find the the next concert that you will never forget</h3>
               <FontAwesomeIcon className="my-2" icon={faPagelines} />
               <a className="btn btn-login animate fadeInUp three my-3" href="/social/login/spotify/">Login to Spotify</a>
@@ -840,7 +843,7 @@ class App extends React.Component {
           <footer className="bottom-bar fixed-bottom d-flex align-items-center justify-content-between p-2">
             <div className="ccs-thank-you mr-5 text-left d-md-inline d-none">Created at <a href="https://carolinacodeschool.org/">Carolina Code School</a><br />Presented Nov, 15th 2019</div>
 
-            <div className="created-by col-12 col-sm">branch.out was made by Joe Powers:
+            <div className="created-by col-12 col-sm text-center text-sm-left text-md-center p-0">branch.out was made by Joe Powers:
               <a className="mx-1" href="https://github.com/ReadySetJoe"><FontAwesomeIcon icon={faGithub} /></a>
               <a className="mx-1" href="https://www.linkedin.com/in/joe-powers/"><FontAwesomeIcon icon={faLinkedin} /></a>
             </div>
