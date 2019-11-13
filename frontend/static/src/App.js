@@ -3,6 +3,7 @@ import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSync } from '@fortawesome/free-solid-svg-icons';
 import { faPagelines, faGithub, faLinkedin, faFontAwesome, faSpotify } from '@fortawesome/free-brands-svg-icons';
+import Alert from 'react-bootstrap/Alert';
 import skBadgePink from './images/sk-badge-pink.svg';
 import poweredBySongkickPink from './images/powered-by-songkick-pink.svg';
 
@@ -63,6 +64,7 @@ class App extends React.Component {
       city: '',
       region: '',
       country_code: '',
+      ip_error: false,
 
       // Artists
       artists_all: [],
@@ -77,12 +79,15 @@ class App extends React.Component {
       // Limbs
       limbs: [],
 
+      no_limb_error_show: false,
+
       // Branch
       branch_name: '',
       branch: [],
       preview: "",
       image: null,
       playlist_id: "",
+      playlist_uri: '',
 
       // Database
       limbs_user: [],
@@ -102,8 +107,8 @@ class App extends React.Component {
     this.makeLimbs = this.makeLimbs.bind(this);
     this.makeBranch = this.makeBranch.bind(this);
     this.handleLimbDelete = this.handleLimbDelete.bind(this);
+    this.handleLimbDeleteModal = this.handleLimbDeleteModal.bind(this);
     this.handleBranchDelete = this.handleBranchDelete.bind(this);
-    this.exportPlaylist = this.exportPlaylist.bind(this);
     this.save = this.save.bind(this);
     this.load = this.load.bind(this);
   }
@@ -129,7 +134,7 @@ class App extends React.Component {
     this.setState({ navigator_has_geolocation: "geolocation" in navigator })
 
     // Get IP Location (not perfectly accurate but quick and easy)
-    axios.get('https://ip-api.com/json')
+    axios.get('http://ip-api.com/json')
       .then((res) => {
         console.log('IP lookup', res);
         this.setState({
@@ -141,7 +146,7 @@ class App extends React.Component {
         })
         this.findEvents()
       })
-      .catch((err) => console.log(err))
+      .catch((err) => { console.log(err); this.setState({ ip_error: true }) })
 
     // Reloads user, based on token stored in state
     if (!this.state.token) {
@@ -254,22 +259,22 @@ class App extends React.Component {
 
   findArtists() {
     let root_artists_selected_ids = []
-    for (let i=0; i<this.state.root_artists_selected.length; i++) {
+    for (let i = 0; i < this.state.root_artists_selected.length; i++) {
       root_artists_selected_ids.push(this.state.root_artists_selected[i].id)
     }
 
     spotifyApi.getArtists(root_artists_selected_ids)
-    .then(res => {
-      console.log('Selected Artist:', res)
-      let artists_all = [...this.state.artists_all]
-      artists_all = artists_all.concat(res.artists)
+      .then(res => {
+        console.log('Selected Artist:', res)
+        let artists_all = [...this.state.artists_all]
+        artists_all = artists_all.concat(res.artists)
 
-      let new_genre_set = res.artists.map(artist => (artist.genres)).values()
-      new_genre_set = new Set(Array.from(new_genre_set).flat())
-      let genre_set = new Set([...this.state.genre_set, ...new_genre_set])
+        let new_genre_set = res.artists.map(artist => (artist.genres)).values()
+        new_genre_set = new Set(Array.from(new_genre_set).flat())
+        let genre_set = new Set([...this.state.genre_set, ...new_genre_set])
 
-      this.setState({ artists_all: artists_all, genre_set: genre_set })
-    })
+        this.setState({ artists_all: artists_all, genre_set: genre_set })
+      })
 
     for (let i = 0; i < this.state.root_artists_selected.length; i++) {
       spotifyApi.getArtistRelatedArtists(this.state.root_artists_selected[i].id)
@@ -300,7 +305,7 @@ class App extends React.Component {
 
   useMyLocation(e) {
     e.preventDefault()
-    this.setState({geolocation_started: true})
+    this.setState({ geolocation_started: true })
     let self = this;
     navigator.geolocation.getCurrentPosition(
       function success(position) {
@@ -392,7 +397,7 @@ class App extends React.Component {
   }
 
   makeLimbs() {
-    this.setState({limbs: []})
+    this.setState({ limbs: [] })
     let events_all = [...this.state.events_all]
     let artists_all = [...this.state.artists_all]
     let unique_names = []
@@ -421,54 +426,20 @@ class App extends React.Component {
         }
       }
     }
-  }
-
-  makeBranch(e) {
-    e.preventDefault()
-    let branches_user = [...this.state.branches_user]
-    branches_user.push({cover: this.state.preview, title: this.state.branch_name, limbs: this.state.branch})
-    this.setState({ branches_user: branches_user })
-
-    let branch_data = new FormData();
-    branch_data.append('title', this.state.branch_name)
-    if (this.state.image) { branch_data.append('cover', this.state.image) }
-    let limbs = []
-    for (let i = 0; i < this.state.limbs.length; i++) {
-      let limb = {
-        artist_url: this.state.limbs[i].artist.uri,
-        artist_id: this.state.limbs[i].artist.id,
-        artist_name: this.state.limbs[i].artist.name,
-        event_id: this.state.limbs[i].event.id,
-        event_uri: this.state.limbs[i].event.uri,
-        event_name: this.state.limbs[i].event.displayName,
-        event_city: this.state.limbs[i].event.location.city,
-        event_date: this.state.limbs[i].event.start.date,
-        venue_name: this.state.limbs[i].event.venue.displayName,
-        venue_id: this.state.limbs[i].event.venue.id,
-        venue_url: this.state.limbs[i].event.venue.uri,
-        song_url: this.state.limbs[i].song.uri,
-        song_name: this.state.limbs[i].song.name,
-        song_preview_url: this.state.limbs[i].song.preview_url,
-      }
-      limbs.push(limb)
+    console.log('This should be empty', unique_names)
+    if (unique_names.length === 0) {
+      console.log('this should show')
+      this.setState({ no_limb_error_show: true })
     }
-    limbs = JSON.stringify(limbs)
-
-    branch_data.append('limbs', limbs)
-
-    axios({
-      method: 'post',
-      url: '/api/v1/branch/',
-      data: branch_data,
-      config: {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      }
-    })
-      .then(res => console.log(res))
-      .catch(err => console.log(err))
   }
 
   handleBranchDelete(branch) {
+    console.log('LOOOK HEREE DUMMY', branch)
+    if (Object.keys(branch).includes('playlist_id')) {
+      spotifyApi.unfollowPlaylist(branch.playlist_id)
+        .then(res => console.log(res))
+        .catch(err => console.log(err))
+    }
     axios.delete(`/api/v1/branch/${branch.id}/`)
       .then(res => {
         let branches_user = [...this.state.branches_user]
@@ -491,28 +462,93 @@ class App extends React.Component {
       .catch(error => { console.log(error) })
   }
 
-  exportPlaylist() {
+  handleLimbDeleteModal(limb) {
+    let limbs_user = [...this.state.limbs_user]
+    let ndx = limbs_user.indexOf(limb)
+    limbs_user.splice(ndx, 1)
+    this.setState({ limbs_user })
+    axios.delete(`/api/v1/limb/${limb.id}/`)
+      .then(res => { console.log(res) })
+      .catch(error => { console.log(error) })
+  }
+
+  makeBranch(e) {
+    e.preventDefault()
     let user_id = this.state.uid
     let name = this.state.branch_name
     let song_uris = []
-    for (let i=0; i<this.state.limbs.length; i++) {
+    for (let i = 0; i < this.state.limbs.length; i++) {
       song_uris.push(this.state.limbs[i].song.uri)
     }
 
-    spotifyApi.createPlaylist(user_id, 
+    spotifyApi.createPlaylist(user_id,
       {
         name: name,
         description: "a playlist of upcoming events generated by branch.out",
       }
     )
-    .then(res => {
-      console.log('Create Playlist Response:', res);
-      this.setState({playlist_id: res.id})
-      spotifyApi.addTracksToPlaylist(res.id, song_uris)
-      .then(res => console.log(res))
+      .then(res => {
+        console.log('Create Playlist Response:', res);
+        let branches_user = [...this.state.branches_user]
+        branches_user.push(
+          {
+            cover: this.state.preview,
+            title: this.state.branch_name,
+            limbs: this.state.branch,
+            playlist_id: res.id,
+            playlist_uri: res.uri,
+          }
+        )
+        this.setState({
+          branches_user: branches_user,
+          playlist_id: res.id,
+          playlist_uri: res.uri, 
+        })
+
+        let branch_data = new FormData();
+        branch_data.append('title', this.state.branch_name)
+        branch_data.append('playlist_id', res.id)
+        branch_data.append('playlist_uri', res.uri)
+        if (this.state.image) { branch_data.append('cover', this.state.image) }
+        let limbs = []
+        for (let i = 0; i < this.state.limbs.length; i++) {
+          let limb = {
+            artist_url: this.state.limbs[i].artist.uri,
+            artist_id: this.state.limbs[i].artist.id,
+            artist_name: this.state.limbs[i].artist.name,
+            event_id: this.state.limbs[i].event.id,
+            event_uri: this.state.limbs[i].event.uri,
+            event_name: this.state.limbs[i].event.displayName,
+            event_city: this.state.limbs[i].event.location.city,
+            event_date: this.state.limbs[i].event.start.date,
+            venue_name: this.state.limbs[i].event.venue.displayName,
+            venue_id: this.state.limbs[i].event.venue.id,
+            venue_url: this.state.limbs[i].event.venue.uri,
+            song_url: this.state.limbs[i].song.uri,
+            song_name: this.state.limbs[i].song.name,
+            song_preview_url: this.state.limbs[i].song.preview_url,
+          }
+          limbs.push(limb)
+        }
+        limbs = JSON.stringify(limbs)
+
+        branch_data.append('limbs', limbs)
+
+        axios({
+          method: 'post',
+          url: '/api/v1/branch/',
+          data: branch_data,
+          config: {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          }
+        })
+          .then(res => console.log(res))
+          .catch(err => console.log(err))
+        spotifyApi.addTracksToPlaylist(res.id, song_uris)
+          .then(res => console.log('Add tracks to playlist:', res))
+          .catch(err => console.log(err))
+      })
       .catch(err => console.log(err))
-    })
-    .catch(err => console.log(err))
   }
 
   handleChange(e) {
@@ -560,6 +596,7 @@ class App extends React.Component {
     state.id = this.state.id;
     state.show_modal = this.state.show_modal;
     state.genre_set = this.state.genre_set;
+    state.no_limb_error_show = this.state.no_limb_error_show;
     localStorage.setItem('state', JSON.stringify(state))
     console.log('State Saved!')
     console.log(state)
@@ -626,7 +663,7 @@ class App extends React.Component {
             limbs={this.state.limbs_user}
             handleClose={() => this.setState({ show_modal: false })}
             handleBranchDelete={this.handleBranchDelete}
-            handleLimbDelete={this.handleLimbDelete}
+            handleLimbDelete={this.handleLimbDeleteModal}
             first_name={this.state.first_name}
           />
 
@@ -635,7 +672,7 @@ class App extends React.Component {
             <div className="d-flex flex-column align-items-center animate fadeInUp two">
               <FontAwesomeIcon className="my-2" icon={faPagelines} />
               <h3 className="my-2">Welcome to branch.out</h3>
-              <h3 className="my-2">A site that helps people find new music, coming to a nearby stage</h3>
+              <h3 className="my-2">A site that helps people find new music, coming to a stage nearby</h3>
               <h3 className="my-2">Let's find the the next concert you will never forget</h3>
               <FontAwesomeIcon className="my-2" icon={faPagelines} />
               <a className="btn btn-login animate fadeInUp three my-3" href="/social/login/spotify/">Login to Spotify</a>
@@ -732,17 +769,22 @@ class App extends React.Component {
 
           {this.state.root_artists_selection_complete && (
             <section className='location d-flex justify-content-center animate fadeInLeft'>
-              <div className={`location-ip p-3 m-4 ${this.state.city !== '' ? ('') : ('d-none')}`}>
-                <h3 className="">Based on your IP address, your location is:</h3>
-                <h2><i>{`${this.state.city}, ${this.state.region}, ${this.state.country_code}`}</i></h2>
-              </div>
+              {this.state.ip_error ?
+                (<div>IP Address Not Found</div>)
+                :
+                (<div className={`location-ip p-3 m-4 ${this.state.city !== '' ? ('') : ('d-none')}`}>
+                  <h3 className="">Based on your IP address, your location is:</h3>
+                  <h2><i>{`${this.state.city}, ${this.state.region}, ${this.state.country_code}`}</i></h2>
+                </div>)}
+
 
               <div className={`location-geo m-4 ${this.state.navigator_has_geolocation ? 'd-flex flex-column' : 'd-none'}`}>
                 <h4>Not your location? Click below for a better guess:</h4>
                 {!this.state.geolocation_complete ?
-                  (<button className="btn m-auto" onClick={this.useMyLocation}>Find My Location</button>)
+                  (<button className="btn m-auto find-location-btn" onClick={this.useMyLocation}>Find My Location
+                  {this.state.geolocation_started && !this.state.geolocation_complete && (<div className="loader"></div>)}</button>)
                   : (<button className="btn m-auto btn-selected">Found!</button>)}
-                {this.state.geolocation_started && !this.state.geolocation_complete && (<div className="loader"></div>)}
+
               </div>
               <div className={`location-zip m-4 ${!this.state.navigator_has_geolocation ? 'd-flex' : 'd-none'}`}>
                 <div>We're sorry, your browser doesn't support geolocation :(</div>
@@ -752,13 +794,21 @@ class App extends React.Component {
           )}
 
           <div className={` ${this.state.root_artists_selection_complete && this.state.latitude !== 0 ? 'd-flex flex-column' : 'd-none'}`}>
-            Let's do the thing
-            <button className="btn" onClick={() => this.makeLimbs()}>Begin</button>
-            <div># of events found: {this.state.events_all.length}</div>
-            <div># of performing artists found: {this.state.events_artists.length}</div>
-            <div># of related artists found: {this.state.artists_all.length}</div>
-            <div># of genres found: {this.state.genre_set.size}</div>
+            <h4>Let's do the thing</h4>
+            <button className="btn m-auto" onClick={() => { this.setState({ no_limb_error_show: false }); this.makeLimbs() }}>Grow New Branch</button>
           </div>
+
+          {this.state.no_limb_error_show && (
+            <Alert className="animate fadeInUp m-2" variant="danger" onClose={() => this.setState({ no_limb_error_show: false })} dismissible>
+              <Alert.Heading>Uh oh! We couldn't find any matches :(</Alert.Heading>
+              <p>
+                Sorry, we weren't able to find any good suggestions with those inputs.
+                Try increasing the number of input artists, or using the artist you're
+                listening to currently to guide the results a bit. If nothing else,
+                check back another time, as we're still perfecting the searching process.
+              </p>
+            </Alert>
+          )}
 
           {this.state.limbs.length > 0 && (
             <section className="animate fadeInUp">
@@ -781,12 +831,20 @@ class App extends React.Component {
                     <input className="branch-name-input" name="branch_name" value={this.state.branch_name} onChange={this.handleChange} type="text" />
                   </div>
                   <div>
-                  <button className="btn" type="submit" value="save">Add to My Branches</button>
-                  <button className="btn" type="button" onClick={this.exportPlaylist}>Export to playlist</button>
+                    {/* <button className="btn" type="submit" value="save">Add to My Branches</button> */}
+                    {this.state.playlist_id === "" ? (
+                      <button className="btn" type="submit" onClick={this.makeBranch}>Save branch &<br /> export to spotify</button>
+                    ) : (
+                        <a className="btn btn-selected" href={this.state.playlist_uri}>View On Spotify</a>
+                      )}
                   </div>
                 </form>
               </header>
               {limbs_table}
+              <h4># of events found: {this.state.events_all.length}</h4>
+              <h4># of performing artists found: {this.state.events_artists.length}</h4>
+              <h4># of related artists found: {this.state.artists_all.length}</h4>
+              <h4># of genres found: {this.state.genre_set.size}</h4>
             </section>)}
         </header>
       </div>

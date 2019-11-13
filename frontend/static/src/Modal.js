@@ -38,26 +38,27 @@ class UserModal extends React.Component {
             <FontAwesomeIcon icon={faPagelines} className='default-branch-svg fa-7x' />
           )}
         <Card.Body>
-          <Card.Title>{branch.title}</Card.Title>
+          <Card.Title><h2>{branch.title}</h2></Card.Title>
         </Card.Body>
         <Card.Body className="py-0">
           <ListGroup className="list-group-flush">
-            {branch.limbs.map((limb, id) =>
-              <ListGroupItem key={id} className="limb p-0 d-flex justify-content-between align-text-center">
-                {/* <div className=""> */}
+            {branch.limbs.length === 0 ? (<h4>No branch limbs found :( Either this branch has no limbs, and can be deleted, or try reloading the page to see the newest entries!</h4>) : (
+              branch.limbs.map((limb, id) =>
+                <ListGroupItem key={id} className="limb p-0 d-flex justify-content-between align-text-center">
+                  {/* <div className=""> */}
                   {/* <div>{id + 1}</div> */}
                   <div className="text-left"><a href={limb.song_url}>{limb.artist_name}</a></div>
                   <div className="text-right"><a target="_blank" rel="noopener noreferrer" href={limb.event_uri}>{limb.venue_name}</a></div>
-                  <button className="btn-delete" onClick={() => {this.props.handleLimbDelete(limb)}}>x</button>
-                {/* </div> */}
-              </ListGroupItem>
+                  <button className="btn-delete" onClick={() => {this.props.handleLimbDelete(limb);}}>x</button>
+                  {/* </div> */}
+                </ListGroupItem>
+              )
             )}
           </ListGroup>
         </Card.Body>
-        <Card.Body>
-          <Button>Export</Button>
-          <Button onClick={() => this.props.handleBranchDelete(branch)}>Delete</Button>
-        </Card.Body>
+        {/* <Card.Body> */}
+          <Button onClick={() => this.props.handleBranchDelete(branch)}>Delete Branch</Button>
+        {/* </Card.Body> */}
 
       </Card>)
 
@@ -75,9 +76,6 @@ class UserModal extends React.Component {
         <Modal.Footer>
           <Button variant="secondary" onClick={this.props.handleClose}>
             Close
-          </Button>
-          <Button variant="primary" onClick={this.props.handleClose}>
-            Save Changes
           </Button>
         </Modal.Footer>
       </Modal>
