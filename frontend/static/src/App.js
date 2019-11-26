@@ -148,9 +148,7 @@ class App extends React.Component {
           this.findEvents()
         })
         .catch(err => console.log(err))
-
     }
-
 
     // Reloads user, based on token stored in state
     if (!this.state.token) {
@@ -428,7 +426,6 @@ class App extends React.Component {
               })
               .catch(err => console.log(err))
           }
-
         }
       }
     }
@@ -440,7 +437,6 @@ class App extends React.Component {
   }
 
   handleBranchDelete(branch) {
-    console.log('LOOOK HEREE DUMMY', branch)
     if (Object.keys(branch).includes('playlist_id')) {
       spotifyApi.unfollowPlaylist(branch.playlist_id)
         .then(res => console.log(res))
