@@ -17,7 +17,7 @@ axios.defaults.xsrfHeaderName = 'X-CSRFToken';
 
 const spotifyApi = new SpotifyWebApi();
 const SPOTIFY_API_INTERVAL_SECS = 3;
-const SPOTIFY_INTERVAL_LIMITER = true;
+const SPOTIFY_INTERVAL_LIMITER = false;
 
 const SK_AUTH_KEY = 'io09K9l3ebJxmxe2'
 
