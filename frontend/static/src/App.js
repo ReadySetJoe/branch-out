@@ -22,7 +22,7 @@ const SPOTIFY_INTERVAL_LIMITER = true;
 const SK_AUTH_KEY = 'io09K9l3ebJxmxe2'
 
 // Debug Variables
-const API_LIMITER = false; // API Limiter (debug boolean ensuring limited API calling) 
+const API_LIMITER = false; // API Limiter (debug boolean ensuring limited API calling)
 const SAVE_TO_LOCAL_STORAGE = false;
 const HEROKU_IP_DISABLE = true;
 
@@ -717,11 +717,9 @@ class App extends React.Component {
               </section>
 
               <button className={`btn ${this.state.use_now_playing ? 'btn-selected' : ''} `} onClick={() => this.useNowPlaying()}>Use Related Artists</button>
+              <button className={`btn ${this.state.use_top_artists ? 'btn-selected' : ''} `} onClick={() => this.useTopArtists()}>Use Your Top Artists</button>
             </div>
-          )
-          // TODO: Add this button back in, but for some reason it's broken :/
-          // <button className={`btn ${this.state.use_top_artists ? 'btn-selected' : ''} `} onClick={() => this.useTopArtists()}>Use Your Top Artists</button>
-          }
+          )}
 
 
           <section className={`${this.state.use_now_playing || this.state.use_top_artists ? 'animate fadeInRight d-flex flex-column align-items-center' : 'd-none'} `}>
@@ -742,8 +740,8 @@ class App extends React.Component {
                     this.findArtists();
                   }
                 }}
-                className={`mt-5 
-                ${this.state.root_artists_selected.length >= 3 ? 'btn' : 'btn btn-disabled'} 
+                className={`mt-5
+                ${this.state.root_artists_selected.length >= 3 ? 'btn' : 'btn btn-disabled'}
                 ${this.state.root_artists_selection_complete ? 'btn-selected' : ''}
                 `}
               >Continue Using These Artists</button>
@@ -826,7 +824,7 @@ class App extends React.Component {
               </header>
               {limbs_table}
               {/* <h5 className="text-left">Some stats for this branch...</h5>
-              <div className="d-flex">                
+              <div className="d-flex">
                 <div className="d-flex flex-column text-left">
                   <h5># of events found: {this.state.events_all.length}</h5>
                   <h5># of performing artists found: {this.state.events_artists.length}</h5>
