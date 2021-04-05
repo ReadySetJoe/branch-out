@@ -22,7 +22,7 @@ const SPOTIFY_INTERVAL_LIMITER = true;
 const SK_AUTH_KEY = 'io09K9l3ebJxmxe2'
 
 // Debug Variables
-const API_LIMITER = false; // API Limiter (debug boolean ensuring limited API calling)
+const API_LIMITER = true; // API Limiter (debug boolean ensuring limited API calling)
 const SAVE_TO_LOCAL_STORAGE = false;
 const HEROKU_IP_DISABLE = true;
 
