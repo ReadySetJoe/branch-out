@@ -51,6 +51,8 @@ INSTALLED_APPS = [
     'allauth',
     'social_django',
     'dj_rest_auth',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.spotify',
 
     # local
     'api',
