@@ -17,7 +17,6 @@ urlpatterns = [
     path('branches/', views.BranchViewSet.as_view({'get': 'user'})),
     path('branch/<int:pk>/', views.BranchRetrieveUpdateDestroyAPIView.as_view(), name='branch_retrieve_update_destroy'),
 
-    # path('user-social-auth/', views.UserSocialAuthRetrieveAPIView.as_view(), name='retrieve'),
     path('user-social-auth/', views.UserSocialAuthViewSet.as_view({'get': 'user'})),
     path('dj-rest-auth/', include('dj_rest_auth.urls')),
 ]
