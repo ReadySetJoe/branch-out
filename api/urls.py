@@ -19,4 +19,5 @@ urlpatterns = [
 
     # path('user-social-auth/', views.UserSocialAuthRetrieveAPIView.as_view(), name='retrieve'),
     path('user-social-auth/', views.UserSocialAuthViewSet.as_view({'get': 'user'})),
+    path('dj-rest-auth/', include('dj_rest_auth.urls')),
 ]
