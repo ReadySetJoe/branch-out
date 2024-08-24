@@ -4,11 +4,11 @@ const Player = props => {
   const backgroundStyles = {
     backgroundImage:`url(${props.item.album.images[0].url})`,
   };
-  
+
   const progressBarStyles = {
     width: (props.progress_ms * 100 / props.item.duration_ms) + '%'
   };
-  
+
   return (
     <div className="App w-100">
       <div className="main-wrapper">

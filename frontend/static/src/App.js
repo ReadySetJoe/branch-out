@@ -207,8 +207,6 @@ class App extends React.Component {
           progress_ms: 0,
         });
       })
-
-
   }
 
   useNowPlaying() {
@@ -720,7 +718,6 @@ class App extends React.Component {
               <button className={`btn ${this.state.use_top_artists ? 'btn-selected' : ''} `} onClick={() => this.useTopArtists()}>Use Your Top Artists</button>
             </div>
           )}
-
 
           <section className={`${this.state.use_now_playing || this.state.use_top_artists ? 'animate fadeInRight d-flex flex-column align-items-center' : 'd-none'} `}>
             <h2 className="animate fade-in-right my-4 align-self-baseline ">Please select at least 3 root artists to continue:</h2>
